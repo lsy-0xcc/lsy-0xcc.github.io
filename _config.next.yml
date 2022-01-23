@@ -5,7 +5,7 @@ scheme: Pisces
 language: zh-CN
 footer:
   since: 2020
-  powered: false
+  powered: true
   icon:
     # name: fa fa-user
     animated: true
