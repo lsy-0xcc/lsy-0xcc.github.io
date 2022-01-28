@@ -1,6 +1,6 @@
 ---
 title: TypeScript 笔记
-date: 2022-01-19 17:19:00
+date: 2022-01-19 17:19:11
 tags:
   - TypeScript
 categories:
