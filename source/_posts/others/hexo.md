@@ -18,13 +18,13 @@ categories:
 
 ```shell
 npm install -g hexo-cli
-hexo init lisongyuan99.github.io
+hexo init lsy-0xcc.github.io
 ```
 
 进入文件夹，安装插件
 
 ```shell
-cd lisongyuan99.github.io
+cd lsy-0xcc.github.io
 yarn add hexo-image-link hexo-theme-next hexo-filter-emoji hexo-deployer-git hexo-generator-searchdb
 ```
 
@@ -46,7 +46,7 @@ timezone: ""
 
 # URL
 ## If your site is put in a subdirectory, set url as 'http://example.com/child' and root as '/child/'
-url: https://lisongyuan99@github.io
+url: https://lsy-0xcc@github.io
 root: /
 # permalink: :year/:month/:day/:title/
 permalink: posts/:title/
@@ -67,7 +67,7 @@ theme: next
 ## Docs: https://hexo.io/docs/one-command-deployment
 deploy:
   - type: git
-    repo: git@github.com:lisongyuan99/lisongyuan99.github.io.git
+    repo: git@github.com:lsy-0xcc/lsy-0xcc.github.io.git
     branch: github-pages
 
 # 内置搜索
@@ -133,7 +133,7 @@ avatar:
 
 # 侧边栏 社交
 social:
-  GitHub: https://github.com/lisongyuan99 || fab fa-github
+  GitHub: https://github.com/lsy-0xcc || fab fa-github
   E-Mail: mailto:lsy114514@hotmail.com || fa fa-envelope
   # Weibo: https://weibo.com/yourname || fab fa-weibo
   # Google: https://plus.google.com/yourname || fab fa-google
@@ -151,7 +151,7 @@ social_icons:
 # Github 章鱼猫
 github_banner:
   enable: true
-  permalink: https://github.com/lisongyuan99
+  permalink: https://github.com/lsy-0xcc
   title: Follow me on GitHub
 
 # 阅读进度条

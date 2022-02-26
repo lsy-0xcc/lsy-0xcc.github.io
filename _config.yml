@@ -15,7 +15,7 @@ timezone: ''
 # 这一堆也要改
 # URL
 ## Set your site url here. For example, if you use GitHub Page, set url as 'https://username.github.io/project'
-url: https://lisongyuan99@github.io
+url: https://lsy-0xcc@github.io
 root: /
 # permalink: :year/:month/:day/:title/
 permalink: posts/:title/
@@ -110,7 +110,7 @@ theme: next
 ## Docs: https://hexo.io/docs/one-command-deployment
 deploy:
 - type: git
-  repo: git@github.com:lisongyuan99/lisongyuan99.github.io.git
+  repo: git@github.com:lsy-0xcc/lsy-0xcc.github.io.git
   branch: github-pages
 
 # 内置搜索

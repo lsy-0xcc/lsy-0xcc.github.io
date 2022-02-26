@@ -50,7 +50,7 @@ avatar:
 
 # 侧边栏 社交
 social:
-  GitHub: https://github.com/lisongyuan99 || fab fa-github
+  GitHub: https://github.com/lsy-0xcc || fab fa-github
   E-Mail: mailto:lsy114514@hotmail.com || fa fa-envelope
   # Weibo: https://weibo.com/yourname || fab fa-weibo
   # Google: https://plus.google.com/yourname || fab fa-google
@@ -68,7 +68,7 @@ social_icons:
 # Github 章鱼猫
 github_banner:
   enable: true
-  permalink: https://github.com/lisongyuan99
+  permalink: https://github.com/lsy-0xcc
   title: Follow me on GitHub
 
 # 阅读进度条
