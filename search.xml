@@ -1,0 +1,339 @@
+<?xml version="1.0" encoding="utf-8"?>
+<search>
+  <entry>
+    <title>Git 单独忽略某一行</title>
+    <url>/posts/devops/git-ignore-line/</url>
+    <content><![CDATA[<p>Git 提交时又是会有文件中包含敏感信息，比如密码，或者用于测试的配置不想提交。而yaml文件不支持导入另一个yaml文件，若全部忽略跟着很麻烦。</p>
+<p>这是一个不提交某行或者不提交代码块的方法。</p>
+<span id="more"></span>
+
+<h2 id="步骤"><a href="#步骤" class="headerlink" title="步骤"></a>步骤</h2><ol>
+<li><p>添加在根目录下添加 <code>.gitattributes</code> 文件</p>
+<figure class="highlight properties"><table><tr><td class="code"><pre><span class="line"><span class="meta">*.yml</span> <span class="string">filter=HashIgnore</span></span><br></pre></td></tr></table></figure>
+
+<p><code>*.yml</code> 为正则表达式，表示所有扩展名为 <code>yml</code> 的文件。可以自己修改。</p>
+<p>这一行表示为所有 <code>yml</code> 文件添filter <code>HashIgnore</code>。</p>
+</li>
+<li><p>配置 filter</p>
+<p>有以下两种方式</p>
+<p>放心大胆地改，写错了可以用 <code>git config --global --edit</code>  或者 <code>git config --global --unset</code> 恢复。</p>
+<ul>
+<li><p>使用命令行</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">git config --global filter.hashignore.clean <span class="string">&quot;sed &#x27;/# *NoCommit$/d&#x27; %f| sed &#x27;/# *BeginNoCommit/,/# *EndNoCommit/d&#x27;&quot;</span></span><br><span class="line">git config --global filter.hashignore.smudge <span class="string">&quot;cat&quot;</span></span><br></pre></td></tr></table></figure></li>
+<li><p>编辑文本</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">git config --global --edit</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight properties"><table><tr><td class="code"><pre><span class="line"><span class="meta">[filter</span> <span class="string">&quot;HashIgnore&quot;]</span></span><br><span class="line">	<span class="attr">clean</span> = <span class="string">&quot;sed &#x27;/# *NoCommit$/d&#x27; %f| sed &#x27;/# *BeginNoCommit/,/# *EndNoCommit/d&#x27;&quot;</span></span><br><span class="line">	<span class="attr">smudge</span> = <span class="string">&quot;cat&quot;</span></span><br></pre></td></tr></table></figure></li>
+</ul>
+</li>
+</ol>
+<h2 id="原理"><a href="#原理" class="headerlink" title="原理"></a>原理</h2><h3 id="gitattributes"><a href="#gitattributes" class="headerlink" title=".gitattributes"></a>.gitattributes</h3><p>.gitattributes文件可以让Git对指定位置的文件或应用一定的规则。这里定义一个filter。</p>
+<p>filter的clean属性表示在执行 <code>git add</code> 时执行的脚本，这里设置忽略某行或某个代码块。</p>
+<p>filter的smudge属性表示在执行 <code>git add</code> 时执行的脚本，<code>cat</code> 表示什么也不做。</p>
+<h4 id="f"><a href="#f" class="headerlink" title="%f"></a>%f</h4><p><strong>脚本中的 <code>%f</code> 表示脚本中需要处理的文件</strong></p>
+<h3 id="sed-命令"><a href="#sed-命令" class="headerlink" title="sed 命令"></a>sed 命令</h3><p>sed 是 Linux 中的流编辑器，用于处理文件</p>
+<p>参考文档<a href="https://www.gnu.org/software/sed/">GNU sed - GNU Project - Free Software Foundation</a></p>
+<p>执行脚本的意义</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">sed <span class="string">&#x27;/# *NoCommit$/d&#x27;</span> %f</span><br></pre></td></tr></table></figure>
+
+<p>表示删除 <code>%f</code> 中匹配 <code># *NoCommit$</code> 正则表达式的行</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">sed <span class="string">&#x27;/# *BeginNoCommit/,/# *EndNoCommit/d&#x27;</span></span><br></pre></td></tr></table></figure>
+
+<p>表示删除匹配 <code># *BeginNoCommit</code> 正则表达式和匹配 <code># *EndNoCommit$</code> 正则表达式之间的所有行</p>
+<h4 id="特殊转义"><a href="#特殊转义" class="headerlink" title="特殊转义"></a>特殊转义</h4><p>由于sed中正则表达式前后要使用 <code>/</code> 符号，所以也需要转义为 <code> \/</code> 。</p>
+<p>如果以后需要在 Java 文件这种使用 <code>//</code> 作为注释的需要注意</p>
+<h3 id="“-”-管道"><a href="#“-”-管道" class="headerlink" title="“|”  管道"></a>“|”  管道</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">command1 | command2</span><br><span class="line">command1 | command2 [ | commandN... ]</span><br></pre></td></tr></table></figure>
+
+<p>当在两个命令之间设置管道时，管道符<code>|</code>左边命令的输出就变成了右边命令的输入。只要第一个命令向标准输出写入，而第二个命令是从标准输入读取，那么这两个命令就可以形成一个管道。大部分的 Linux 命令都可以用来形成管道。</p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://stackoverflow.com/questions/6557467/can-git-ignore-a-specific-line/22171275#22171275">gitx - Can git ignore a specific line? - Stack Overflow</a></p>
+<p><a href="https://git-scm.com/docs/gitattributes">https://git-scm.com/docs/gitattributes</a></p>
+<p><a href="https://www.gnu.org/software/sed/">GNU sed - GNU Project - Free Software Foundation</a></p>
+<p><a href="http://c.biancheng.net/view/3131.html">Linux Shell管道详解</a></p>
+]]></content>
+      <categories>
+        <category>DevOps</category>
+        <category>Git</category>
+      </categories>
+      <tags>
+        <tag>Git</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>JavaScript 扩展运算符(...) 解构赋值 函数调用</title>
+    <url>/posts/front-end/JavaScript-spread/</url>
+    <content><![CDATA[<h2 id="长求总"><a href="#长求总" class="headerlink" title="长求总"></a>长求总</h2><ul>
+<li>解构赋值</li>
+<li>函数的 rest 参数和 spread 语法</li>
+<li>适用于对象和数组</li>
+<li>用来折腾复杂的对象或者数组，或者用来定义参数特别多特别乱的函数</li>
+</ul>
+<span id="more"></span>
+
+<h2 id="解构赋值"><a href="#解构赋值" class="headerlink" title="解构赋值"></a>解构赋值</h2><h3 id="数组解构"><a href="#数组解构" class="headerlink" title="数组解构"></a>数组解构</h3><figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line"><span class="keyword">let</span>[firstName, secondName] = [<span class="string">&quot;John&quot;</span>, <span class="string">&quot;Doe&quot;</span>];</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><p>意味着复制一个新的，不破坏</p>
+</li>
+<li><p>可以用逗号忽略</p>
+<figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 不需要第二个元素</span></span><br><span class="line"><span class="keyword">let</span> [firstName, , title] = [<span class="string">&quot;Julius&quot;</span>, <span class="string">&quot;Caesar&quot;</span>, <span class="string">&quot;Consul&quot;</span>, <span class="string">&quot;of the Roman Republic&quot;</span>];</span><br><span class="line">alert( title ); <span class="comment">// Consul</span></span><br></pre></td></tr></table></figure></li>
+<li><p>等号右侧可以是任何可迭代对象</p>
+</li>
+<li><p>赋值给等号左侧的任何内容</p>
+</li>
+<li><p>与 .entries() 方法进行循环操作</p>
+</li>
+<li><p>交换变量值的技巧<code>[guest, admin] = [admin, guest];</code></p>
+</li>
+</ul>
+<h4 id="剩余元素"><a href="#剩余元素" class="headerlink" title="剩余元素"></a>剩余元素</h4><p>这里用了<strong>三个点</strong>，剩下的东西扔数组里</p>
+<figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line"><span class="keyword">let</span> [name1, name2, ...rest] = [<span class="string">&quot;Julius&quot;</span>, <span class="string">&quot;Caesar&quot;</span>, <span class="string">&quot;Consul&quot;</span>, <span class="string">&quot;of the Roman Republic&quot;</span>];</span><br><span class="line"></span><br><span class="line">alert(name1); <span class="comment">// Julius</span></span><br><span class="line">alert(name2); <span class="comment">// Caesar</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 请注意，`rest` 的类型是数组</span></span><br><span class="line">alert(rest[<span class="number">0</span>]); <span class="comment">// Consul</span></span><br><span class="line">alert(rest[<span class="number">1</span>]); <span class="comment">// of the Roman Republic</span></span><br><span class="line">alert(rest.length); <span class="comment">// 2</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="默认值"><a href="#默认值" class="headerlink" title="默认值"></a>默认值</h4><figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 默认值</span></span><br><span class="line"><span class="keyword">let</span> [name = <span class="string">&quot;Guest&quot;</span>, surname = <span class="string">&quot;Anonymous&quot;</span>] = [<span class="string">&quot;Julius&quot;</span>];</span><br><span class="line"></span><br><span class="line">alert(name);    <span class="comment">// Julius（来自数组的值）</span></span><br><span class="line">alert(surname); <span class="comment">// Anonymous（默认值被使用了）</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="数组展开"><a href="#数组展开" class="headerlink" title="数组展开"></a>数组展开</h4><p>这里用了<strong>三个点</strong>，相当于把数组打开成单个元素</p>
+<figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line"><span class="keyword">let</span> array = [<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>]</span><br><span class="line"><span class="keyword">let</span> newArray = [<span class="number">4</span>,<span class="number">5</span>,...array,<span class="number">6</span>,...<span class="string">&quot;hello&quot;</span>] <span class="comment">// [4, 5, 1, 2, 3, 6, &#x27;h&#x27;, &#x27;e&#x27;, &#x27;l&#x27;, &#x27;l&#x27;, &#x27;o&#x27;]</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="对象解构"><a href="#对象解构" class="headerlink" title="对象解构"></a>对象解构</h3><figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line"><span class="keyword">let</span> &#123;var1, var2&#125; = &#123;<span class="attr">var1</span>:…, <span class="attr">var2</span>:…&#125;</span><br><span class="line"><span class="comment">// var1 var2 可以换位置，不影响结果。</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 自定义变量名</span></span><br><span class="line"><span class="keyword">let</span> options = &#123;</span><br><span class="line">  <span class="attr">title</span>: <span class="string">&quot;Menu&quot;</span>,</span><br><span class="line">  <span class="attr">width</span>: <span class="number">100</span>,</span><br><span class="line">  <span class="attr">height</span>: <span class="number">200</span></span><br><span class="line">&#125;;</span><br><span class="line"><span class="comment">// &#123; 对象属性: 变量名 &#125;</span></span><br><span class="line"><span class="keyword">let</span> &#123;<span class="attr">width</span>: w, <span class="attr">height</span>: h, title&#125; = options <span class="comment">// ;</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="剩余元素-1"><a href="#剩余元素-1" class="headerlink" title="剩余元素"></a>剩余元素</h4><figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line"><span class="keyword">let</span> options = &#123;</span><br><span class="line">  <span class="attr">title</span>: <span class="string">&quot;Menu&quot;</span>,</span><br><span class="line">  <span class="attr">width</span>: <span class="number">100</span>,</span><br><span class="line">  <span class="attr">height</span>: <span class="number">200</span></span><br><span class="line">&#125;;</span><br><span class="line"><span class="keyword">let</span> &#123;title, ...shape&#125; = options;</span><br></pre></td></tr></table></figure>
+
+<h4 id="默认值-1"><a href="#默认值-1" class="headerlink" title="默认值"></a>默认值</h4><figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line"><span class="keyword">let</span> options = &#123;</span><br><span class="line">  <span class="attr">title</span>: <span class="string">&quot;Menu&quot;</span></span><br><span class="line">&#125;;</span><br><span class="line"><span class="keyword">let</span> &#123;width = <span class="number">100</span>, height = <span class="number">200</span>, title&#125; = options;</span><br></pre></td></tr></table></figure>
+
+<h4 id="对象展开"><a href="#对象展开" class="headerlink" title="对象展开"></a>对象展开</h4><p>这里用了<strong>三个点</strong>，相当于把对象摊平</p>
+<figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line"><span class="keyword">let</span> shape = &#123;<span class="attr">width</span>:<span class="number">16</span>, <span class="attr">height</span>:<span class="number">9</span>&#125;</span><br><span class="line"><span class="keyword">let</span> square = &#123;<span class="attr">title</span>:<span class="string">&quot;I&#x27;m square&quot;</span>, ...shape&#125; <span class="comment">// &#123;title: &quot;I&#x27;m square&quot;, width: 16, height: 9&#125;</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="关于函数"><a href="#关于函数" class="headerlink" title="关于函数"></a>关于函数</h2><h3 id="Rest-参数与-Spread-语法"><a href="#Rest-参数与-Spread-语法" class="headerlink" title="Rest 参数与 Spread 语法"></a>Rest 参数与 Spread 语法</h3><ul>
+<li>若 … 出现在函数参数列表的最后，那么它就是 rest 参数，它会把参数列表中剩余的参数收集到一个数组中。</li>
+<li>若 … 出现在函数调用或类似的表达式中，那它就是 spread 语法，它会把一个数组展开为列表。</li>
+</ul>
+<h3 id="智能函数参数"><a href="#智能函数参数" class="headerlink" title="智能函数参数"></a>智能函数参数</h3><p>和解构对象相同</p>
+<figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line"><span class="keyword">let</span> options = &#123;</span><br><span class="line">  <span class="attr">title</span>: <span class="string">&quot;My menu&quot;</span>,</span><br><span class="line">  <span class="attr">items</span>: [<span class="string">&quot;Item1&quot;</span>, <span class="string">&quot;Item2&quot;</span>]</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">showMenu</span>(<span class="params">&#123;</span></span></span><br><span class="line"><span class="params"><span class="function">  title = <span class="string">&quot;Untitled&quot;</span>,</span></span></span><br><span class="line"><span class="params"><span class="function">  width: w = <span class="number">100</span>,  <span class="regexp">//</span> width goes to w</span></span></span><br><span class="line"><span class="params"><span class="function">  height: h = <span class="number">200</span>, <span class="regexp">//</span> height goes to h</span></span></span><br><span class="line"><span class="params"><span class="function">  items: [item1, item2] <span class="regexp">//</span> items first element goes to item1, second to item2</span></span></span><br><span class="line"><span class="params"><span class="function">&#125;</span>) </span>&#123;</span><br><span class="line">  alert( <span class="string">`<span class="subst">$&#123;title&#125;</span> <span class="subst">$&#123;w&#125;</span> <span class="subst">$&#123;h&#125;</span>`</span> ); <span class="comment">// My Menu 100 200</span></span><br><span class="line">  alert( item1 ); <span class="comment">// Item1</span></span><br><span class="line">  alert( item2 ); <span class="comment">// Item2</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">showMenu(options);</span><br></pre></td></tr></table></figure>
+]]></content>
+      <categories>
+        <category>前端</category>
+        <category>JavaSript</category>
+      </categories>
+      <tags>
+        <tag>JavaScript</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>JavaScript 笔记</title>
+    <url>/posts/front-end/JavaScript/</url>
+    <content><![CDATA[<p>教程来自</p>
+<ul>
+<li><a href="https://zh.javascript.info/">现代 JavaScript 教程</a></li>
+</ul>
+<span id="more"></span>
+
+<h2 id="基础"><a href="#基础" class="headerlink" title="基础"></a>基础</h2><ol>
+<li>假值 <code>false</code> <code>0</code> <code>NaN</code> <code>undiefined</code> <code>null</code> <code>&quot;&quot;</code></li>
+<li><code>??</code> 空值合并运算符<ul>
+<li><code>a??default</code> 若 <code>a</code> 是 <code>null</code> 或 <code>undefined</code> 返回 <code>default</code> 否则返回 <code>a</code></li>
+</ul>
+</li>
+</ol>
+<h2 id="对象"><a href="#对象" class="headerlink" title="对象"></a>对象</h2><h2 id="数据类型"><a href="#数据类型" class="headerlink" title="数据类型"></a>数据类型</h2><ol>
+<li>原始类型<ol>
+<li>只有 <code>string</code> <code>number</code> <code>bigint</code> <code>boolean</code> <code>symbol</code> <code>null</code> <code>undefined</code></li>
+<li>调用方法会自动包装，<code>null</code> <code>undefined</code> 无属性和方法</li>
+<li>自动包装 <code>String()</code> <code>Number()</code> <code>Boolean()</code> 一般不要用</li>
+</ol>
+</li>
+<li>数字<ol>
+<li>0b 0o 0x …e…</li>
+<li>常用函数<ul>
+<li><code>number.toString(base)</code> 以 base 为进制转换</li>
+<li><code>parseInt(str [,radix])</code> radix是进制</li>
+<li>Math.ceil Math.floor Math.round Math.trunc number.toFixed(n)</li>
+</ul>
+</li>
+</ol>
+</li>
+<li>bigint 整形 n 结尾</li>
+<li>字符串</li>
+<li>数组</li>
+</ol>
+<h2 id="函数"><a href="#函数" class="headerlink" title="函数"></a>函数</h2><h2 id="对象属性配置"><a href="#对象属性配置" class="headerlink" title="对象属性配置"></a>对象属性配置</h2><h2 id="原型继承"><a href="#原型继承" class="headerlink" title="原型继承"></a>原型继承</h2><h2 id="类"><a href="#类" class="headerlink" title="类"></a>类</h2>]]></content>
+      <categories>
+        <category>前端</category>
+        <category>JavaSript</category>
+      </categories>
+      <tags>
+        <tag>JavaScript</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>TypeScript 笔记</title>
+    <url>/posts/front-end/TypeScript/</url>
+    <content><![CDATA[<p>教程来自</p>
+<ul>
+<li><a href="https://typescript.bootcss.com/">TypeScript 中文手册</a></li>
+<li><a href="https://zhongsp.gitbooks.io/typescript-handbook/content/">TypeScript Handbook（中文版）</a></li>
+<li><a href="https://ts.xcatliu.com/">TypeScript 入门教程</a><span id="more"></span></li>
+</ul>
+<h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><ul>
+<li>静态类型(编译时检测类型)<ul>
+<li>JS 是动态类型 运行时检测</li>
+</ul>
+</li>
+<li>弱类型(允许隐式类型转换)<ul>
+<li>可以使用 ESLint 提供更严格约束</li>
+</ul>
+</li>
+</ul>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">npm install -g typescript</span><br><span class="line"></span><br><span class="line">tsc hello.ts</span><br></pre></td></tr></table></figure>
+
+<p>TypeScript 只会在编译时对类型进行静态检查，如果发现有错误，编译的时候就会报错。<br>TypeScript 编译的时候即使报错了，还是会生成编译结果.</p>
+<h2 id="类型简介"><a href="#类型简介" class="headerlink" title="类型简介"></a>类型简介</h2><h3 id="简单类型"><a href="#简单类型" class="headerlink" title="简单类型"></a>简单类型</h3><h4 id="原始数据类型"><a href="#原始数据类型" class="headerlink" title="原始数据类型"></a>原始数据类型</h4><figure class="highlight typescript"><table><tr><td class="code"><pre><span class="line"><span class="keyword">let</span> name: <span class="built_in">string</span> = <span class="string">&quot;Tom&quot;</span>;</span><br><span class="line"><span class="keyword">let</span> age: <span class="built_in">number</span> = <span class="number">25</span>;</span><br><span class="line"><span class="keyword">let</span> isStudent: <span class="built_in">boolean</span> = <span class="literal">true</span>;</span><br></pre></td></tr></table></figure>
+
+<p><code>new Boolean(1)</code> 是 <code>Boolean</code> 对象 <code>Boolean(1)</code> 才是布尔型</p>
+<ul>
+<li><code>boolean</code></li>
+<li><code>number</code></li>
+<li><code>string</code></li>
+<li><code>null</code> 和 <code>undefined</code><ul>
+<li>是所有类型的子类型，可以赋值给任何类型</li>
+<li>加上 <code>strictNullChecks</code> 赋值给其他类型会报错</li>
+</ul>
+</li>
+</ul>
+<h4 id="any"><a href="#any" class="headerlink" title="any"></a>any</h4><p>任何类型都可以赋值给 any 类型，any 类型也可以赋值给任何类型，any 类型可以执行所有函数。</p>
+<h4 id="unknow"><a href="#unknow" class="headerlink" title="unknow"></a>unknow</h4><p>unknown 类型的变量只能赋值给 any 和 unknown，不能赋给其他类型，unknown 类型的所有函数都会报错。</p>
+<figure class="highlight typescript"><table><tr><td class="code"><pre><span class="line"><span class="keyword">let</span> foo: <span class="built_in">any</span> = <span class="number">123</span>;</span><br><span class="line"><span class="built_in">console</span>.log(foo.msg); <span class="comment">// 符合TS的语法</span></span><br><span class="line"><span class="keyword">let</span> a_value1: unknown = foo; <span class="comment">// OK</span></span><br><span class="line"><span class="keyword">let</span> a_value2: <span class="built_in">any</span> = foo; <span class="comment">// OK</span></span><br><span class="line"><span class="keyword">let</span> a_value3: <span class="built_in">string</span> = foo; <span class="comment">// OK</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">let</span> bar: unknown = <span class="number">222</span>; <span class="comment">// OK</span></span><br><span class="line"><span class="built_in">console</span>.log(bar.msg); <span class="comment">// Error</span></span><br><span class="line"><span class="keyword">let</span> k_value1: unknown = bar; <span class="comment">// OK</span></span><br><span class="line"><span class="keyword">let</span> K_value2: <span class="built_in">any</span> = bar; <span class="comment">// OK</span></span><br><span class="line"><span class="keyword">let</span> K_value3: <span class="built_in">string</span> = bar; <span class="comment">// Error</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="void"><a href="#void" class="headerlink" title="void"></a>void</h4><p>没有任何类型，用于没有返回值的函数</p>
+<figure class="highlight typescript"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">hello</span>(<span class="params"></span>): <span class="title">void</span> </span>&#123;</span><br><span class="line">  <span class="built_in">console</span>.log(<span class="string">&quot;hello world&quot;</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="never"><a href="#never" class="headerlink" title="never"></a>never</h4><p>永不存在的值，用于永远不会正常返回的函数</p>
+<figure class="highlight typescript"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">error</span>(<span class="params">message: <span class="built_in">string</span></span>): <span class="title">never</span> </span>&#123;</span><br><span class="line">  <span class="keyword">throw</span> <span class="keyword">new</span> <span class="built_in">Error</span>(message);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">infiniteLoop</span>(<span class="params"></span>): <span class="title">never</span> </span>&#123;</span><br><span class="line">  <span class="keyword">while</span> (<span class="literal">true</span>) &#123;&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="类型断言"><a href="#类型断言" class="headerlink" title="类型断言"></a>类型断言</h3><p>告诉编译器，“相信我，我知道自己在干什么”。<br>相当于类型转换，但是不进行特殊的数据检查和解构。</p>
+<figure class="highlight typescript"><table><tr><td class="code"><pre><span class="line"><span class="keyword">let</span> someValue: <span class="built_in">any</span> = <span class="string">&quot;this is a string&quot;</span>;</span><br><span class="line"><span class="keyword">let</span> strLength: <span class="built_in">number</span> = (&lt;<span class="built_in">string</span>&gt;someValue).length;</span><br><span class="line"></span><br><span class="line"><span class="keyword">let</span> someValue: <span class="built_in">any</span> = <span class="string">&quot;this is a string&quot;</span>;</span><br><span class="line"><span class="keyword">let</span> strLength: <span class="built_in">number</span> = (someValue <span class="keyword">as</span> <span class="built_in">string</span>).length; <span class="comment">// 支持JSX</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="类型推断"><a href="#类型推断" class="headerlink" title="类型推断"></a>类型推断</h3><p>一个变量没有显示指定类型，声明时就赋值时确定类型，声明时不赋值是 any 类型。</p>
+<figure class="highlight typescript"><table><tr><td class="code"><pre><span class="line"><span class="keyword">let</span> name = <span class="string">&quot;John&quot;</span>; <span class="comment">// string</span></span><br><span class="line"><span class="keyword">let</span> age;</span><br><span class="line">age = <span class="number">20</span>; <span class="comment">// any</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="其他类型"><a href="#其他类型" class="headerlink" title="其他类型"></a>其他类型</h3><h4 id="Array"><a href="#Array" class="headerlink" title="Array"></a>Array</h4><p><code>类型[]</code> 或 <code>Array&lt;类型&gt;</code></p>
+<h4 id="enum"><a href="#enum" class="headerlink" title="enum"></a>enum</h4><figure class="highlight typescript"><table><tr><td class="code"><pre><span class="line"><span class="built_in">enum</span> Direction &#123;</span><br><span class="line">  NORTH,</span><br><span class="line">  SOUTH,</span><br><span class="line">  EAST,</span><br><span class="line">  WEST,</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">let</span> dir: Direction = Direction.NORTH;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 指定值</span></span><br><span class="line"><span class="built_in">enum</span> Direction &#123;</span><br><span class="line">  NORTH = <span class="number">5</span>,</span><br><span class="line">  SOUTH, \\<span class="number">6</span></span><br><span class="line">  EAST, \\<span class="number">7</span></span><br><span class="line">  WEST, \\<span class="number">8</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">let</span> dir: Direction = Direction.NORTH;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 指定string要显式指定所有的</span></span><br><span class="line"><span class="built_in">enum</span> Direction &#123;</span><br><span class="line">  NORTH = <span class="string">&quot;NORTH&quot;</span>,</span><br><span class="line">  SOUTH = <span class="string">&quot;SOUTH&quot;</span>,</span><br><span class="line">  EAST = <span class="string">&quot;EAST&quot;</span>,</span><br><span class="line">  WEST = <span class="string">&quot;WEST&quot;</span>,</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">let</span> dir: Direction = Direction.NORTH;</span><br></pre></td></tr></table></figure>
+
+<h4 id="tuple"><a href="#tuple" class="headerlink" title="tuple"></a>tuple</h4><p>析构声明赋值</p>
+<figure class="highlight typescript"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 一次必须全指定</span></span><br><span class="line"><span class="keyword">let</span> tupleType: [<span class="built_in">string</span>, <span class="built_in">boolean</span>];</span><br><span class="line">tupleType = [<span class="string">&quot;Semlinker&quot;</span>, <span class="literal">true</span>];</span><br></pre></td></tr></table></figure>
+
+<h4 id="联合类型"><a href="#联合类型" class="headerlink" title="联合类型"></a>联合类型</h4><p>可以是多种类型中的一种，只能访问共有属性和方法，如果被赋值会自动推断类型。</p>
+<figure class="highlight typescript"><table><tr><td class="code"><pre><span class="line"><span class="keyword">let</span> a: <span class="built_in">number</span>|<span class="built_in">string</span> = <span class="number">123</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="字符串字面量"><a href="#字符串字面量" class="headerlink" title="字符串字面量"></a>字符串字面量</h4><p>字符串字面量类型用来约束取值只能是某几个字符串中的一个。</p>
+<figure class="highlight typescript"><table><tr><td class="code"><pre><span class="line"><span class="keyword">type</span> EventNames = <span class="string">&#x27;click&#x27;</span> | <span class="string">&#x27;scroll&#x27;</span> | <span class="string">&#x27;mousemove&#x27;</span>;</span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">handleEvent</span>(<span class="params">ele: Element, event: EventNames</span>) </span>&#123;</span><br><span class="line">  <span class="comment">// do something</span></span><br><span class="line">&#125;</span><br><span class="line">handleEvent(<span class="built_in">document</span>.getElementById(<span class="string">&#x27;hello&#x27;</span>), <span class="string">&#x27;scroll&#x27;</span>);  <span class="comment">// 没问题</span></span><br><span class="line">handleEvent(<span class="built_in">document</span>.getElementById(<span class="string">&#x27;world&#x27;</span>), <span class="string">&#x27;dblclick&#x27;</span>); <span class="comment">// 报错，event 不能为 &#x27;dblclick&#x27;</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="接口"><a href="#接口" class="headerlink" title="接口"></a>接口</h3><h4 id="接口定义"><a href="#接口定义" class="headerlink" title="接口定义"></a>接口定义</h4><p>定义复杂的类型用于判定，只要传入的对象包含字段就通过（李斯科夫替换法则）<br>鸭式判定：“当我看到一只鸟，它走路像鸭子、游泳像鸭子、叫声像鸭子，我就称其为鸭子。”<br>“如果它看起来像鸭子，叫起来也像鸭子，但是它需要电池才能工作，那么你的抽象大概是做错了。”</p>
+<figure class="highlight typescript"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">printLabel</span>(<span class="params">labelledObj: &#123; label: <span class="built_in">string</span> &#125;</span>) </span>&#123;</span><br><span class="line">  <span class="built_in">console</span>.log(labelledObj.label);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">let</span> myObj = &#123; <span class="attr">size</span>: <span class="number">10</span>, <span class="attr">label</span>: <span class="string">&quot;Size 10 Object&quot;</span> &#125;;</span><br><span class="line">printLabel(myObj);</span><br><span class="line"></span><br><span class="line"><span class="comment">// ------------------</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">interface</span> LabelledValue &#123;</span><br><span class="line">  <span class="attr">label</span>: <span class="built_in">string</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">printLabel</span>(<span class="params">labelledObj: LabelledValue</span>) </span>&#123;</span><br><span class="line">  <span class="built_in">console</span>.log(labelledObj.label);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">let</span> myObj = &#123; <span class="attr">size</span>: <span class="number">10</span>, <span class="attr">label</span>: <span class="string">&quot;Size 10 Object&quot;</span> &#125;;</span><br><span class="line">printLabel(myObj);</span><br></pre></td></tr></table></figure>
+
+<p>编译器只会检查那些必需的属性是否存在，并且其类型是否匹配。</p>
+<h4 id="可选属性"><a href="#可选属性" class="headerlink" title="可选属性"></a>可选属性</h4><p>接口里的属性不全都是必需的。 有些是只在某些条件下存在，或者根本不存在。</p>
+<figure class="highlight typescript"><table><tr><td class="code"><pre><span class="line"><span class="keyword">interface</span> SquareConfig &#123;</span><br><span class="line">  color?: <span class="built_in">string</span>;</span><br><span class="line">  width?: <span class="built_in">number</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="只读属性"><a href="#只读属性" class="headerlink" title="只读属性"></a>只读属性</h4><figure class="highlight typescript"><table><tr><td class="code"><pre><span class="line"><span class="keyword">interface</span> Point &#123;</span><br><span class="line">  <span class="keyword">readonly</span> x: <span class="built_in">number</span>;</span><br><span class="line">  <span class="keyword">readonly</span> y: <span class="built_in">number</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">let</span> p1: Point = &#123; <span class="attr">x</span>: <span class="number">10</span>, <span class="attr">y</span>: <span class="number">20</span> &#125;;</span><br><span class="line">p1.x = <span class="number">5</span>; <span class="comment">// error!</span></span><br></pre></td></tr></table></figure>
+
+<p>定义了就改不了</p>
+<h4 id="额外的属性检查"><a href="#额外的属性检查" class="headerlink" title="额外的属性检查"></a>额外的属性检查</h4><p>参考：<a href="https://segmentfault.com/a/1190000022418050">TypeScript 额外的属性检查 - SegmentFault 思否</a></p>
+<blockquote>
+<p>发现报错的第一个例子中，我们传入函数的是一个类似于{ color: “black”, opacity: 0.5 }的对象字面量（object literal），而在第二个不报错的例子中，我们传入的是一个类似于 myObj 的变量（variable）。</p>
+<p>由此我们可以看到，TypeScript 中额外的属性检查只会应用于对象字面量场景，所以，在 TS 的官方测试用例里面，我们看到的都是 objectLiteralExcessProperties.ts。</p>
+<p>用变量的情况下，即使他是类似于 function printLabel(labeledObj: LabeledValue)这样函数中的一个参数，也不会触发额外属性检查，因为他会走另一个逻辑：类型兼容性</p>
+<p>回到上面的例子，在定义 myObj 的时候，并没有指定它的类型，所以 TS 会推断他的类型为{ size: number; label: string; }。当他作为参数传入 printLabel 函数时，ts 会比较它和 LabelledValue 是否兼容，因为 LabelledValue 中的 label 属性的，myObj 也存在，所以他们是兼容的，这就是最上面提到的鸭式辨型法。</p>
+<ol>
+<li><p>每个对象字面量在初始化的时候都被认为是新鲜（fresh）的</p>
+</li>
+<li><p>当一个新鲜的对象字面量在赋值给一个非空类型的变量，或者作为一个非空类型的参数时，如果这个对象字面量里没有那个非空类型中指定的属性，就会报错</p>
+</li>
+<li><p>在类型断言后，或者对象字面量的类型被拓展后，新鲜度会消失，此时对象字面量就不再新鲜</p>
+</li>
+</ol>
+</blockquote>
+<h3 id="函数类型"><a href="#函数类型" class="headerlink" title="函数类型"></a>函数类型</h3><h4 id="函数声明"><a href="#函数声明" class="headerlink" title="函数声明"></a>函数声明</h4><figure class="highlight typescript"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">sum</span>(<span class="params">x: <span class="built_in">number</span>, y: <span class="built_in">number</span></span>): <span class="title">number</span> </span>&#123;</span><br><span class="line">  <span class="keyword">return</span> x + y;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>输入输出都要考虑到，输入的参数多了少了都不行。</p>
+<h4 id="函数表达式"><a href="#函数表达式" class="headerlink" title="函数表达式"></a>函数表达式</h4><p>可以通过赋值操作进行类型推论</p>
+<figure class="highlight typescript"><table><tr><td class="code"><pre><span class="line"><span class="keyword">let</span> mySum = <span class="function"><span class="keyword">function</span> (<span class="params">x: <span class="built_in">number</span>, y: <span class="built_in">number</span></span>): <span class="title">number</span> </span>&#123;</span><br><span class="line">  <span class="keyword">return</span> x + y;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>使用了类型推断，想自己手写按照下面的写</p>
+<figure class="highlight typescript"><table><tr><td class="code"><pre><span class="line"><span class="keyword">let</span> mySum: <span class="function">(<span class="params">x: <span class="built_in">number</span>, y: <span class="built_in">number</span></span>) =&gt;</span> <span class="built_in">number</span> = <span class="function"><span class="keyword">function</span> (<span class="params">x: <span class="built_in">number</span>, y: <span class="built_in">number</span></span>): <span class="title">number</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> x + y;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 箭头函数</span></span><br><span class="line"><span class="keyword">let</span> mySum: <span class="function">(<span class="params">x: <span class="built_in">number</span>, y: <span class="built_in">number</span></span>) =&gt;</span> <span class="built_in">number</span> = (x: <span class="built_in">number</span>, <span class="attr">y</span>: <span class="built_in">number</span>): <span class="function"><span class="params">number</span> =&gt;</span> &#123;</span><br><span class="line">  <span class="keyword">return</span> x + y;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h4 id="使用接口定义函数"><a href="#使用接口定义函数" class="headerlink" title="使用接口定义函数"></a>使用接口定义函数</h4><figure class="highlight typescript"><table><tr><td class="code"><pre><span class="line"><span class="keyword">interface</span> SearchFunc &#123;</span><br><span class="line">    (source: <span class="built_in">string</span>, <span class="attr">subString</span>: <span class="built_in">string</span>): <span class="built_in">boolean</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">let</span> mySearch: SearchFunc;</span><br><span class="line">mySearch = <span class="function"><span class="keyword">function</span>(<span class="params">source: <span class="built_in">string</span>, subString: <span class="built_in">string</span></span>) </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> source.search(subString) !== -<span class="number">1</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="可选参数、默认值、剩余参数"><a href="#可选参数、默认值、剩余参数" class="headerlink" title="可选参数、默认值、剩余参数"></a>可选参数、默认值、剩余参数</h4><ul>
+<li>可选参数后不允许出现必须参数</li>
+<li>有了默认值就可以在后面加必须参数了</li>
+<li>剩余参数用 … 操作符 相当于数组</li>
+</ul>
+<figure class="highlight typescript"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">buildName</span>(<span class="params">firstName: <span class="built_in">string</span>, lastName?: <span class="built_in">string</span></span>)</span>&#123;&#125;</span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">buildName</span>(<span class="params">firstName: <span class="built_in">string</span>, lastName: <span class="built_in">string</span> = <span class="string">&#x27;Cat&#x27;</span></span>)</span>&#123;&#125;</span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">push</span>(<span class="params">array: <span class="built_in">any</span>[], ...items: <span class="built_in">any</span>[]</span>)</span>&#123;&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="重载"><a href="#重载" class="headerlink" title="重载"></a>重载</h4><p>函数重载：<strong>函数项名称相同</strong> 但输入输出类型或个数不同的子程序，它可以简单地称为一个单独功能可以执行多项任务的能力。</p>
+<figure class="highlight typescript"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 重载签名</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">add</span>(<span class="params">x:<span class="built_in">string</span>,y:<span class="built_in">string</span></span>):<span class="title">string</span></span>;</span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">add</span>(<span class="params">x:<span class="built_in">number</span>, y:<span class="built_in">number</span></span>):<span class="title">number</span></span>;</span><br><span class="line"><span class="comment">//实现签名 对外不可见</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">add</span>(<span class="params">x:<span class="built_in">string</span>|<span class="built_in">number</span>, y: <span class="built_in">number</span>|<span class="built_in">string</span></span>): <span class="title">number</span> | <span class="title">string</span></span></span><br></pre></td></tr></table></figure>
+
+<h3 id="类型别名"><a href="#类型别名" class="headerlink" title="类型别名"></a>类型别名</h3><p>给已有的类型起个新名字，一般要大写</p>
+<figure class="highlight typescript"><table><tr><td class="code"><pre><span class="line"><span class="keyword">type</span> Name = <span class="built_in">string</span>;</span><br><span class="line"><span class="keyword">type</span> NameResolver = <span class="function">() =&gt;</span> <span class="built_in">string</span>;</span><br><span class="line"><span class="keyword">type</span> NameOrResolver = Name | NameResolver;</span><br></pre></td></tr></table></figure>
+
+<h3 id="类"><a href="#类" class="headerlink" title="类"></a>类</h3><h4 id="接口的关系"><a href="#接口的关系" class="headerlink" title="接口的关系"></a>接口的关系</h4><h3 id="泛型"><a href="#泛型" class="headerlink" title="泛型"></a>泛型</h3><h3 id="声明合并"><a href="#声明合并" class="headerlink" title="声明合并"></a>声明合并</h3><h2 id="编写d-ts文件"><a href="#编写d-ts文件" class="headerlink" title="编写d.ts文件"></a>编写<code>d.ts</code>文件</h2>]]></content>
+      <categories>
+        <category>前端</category>
+        <category>TypeScript</category>
+      </categories>
+      <tags>
+        <tag>TypeScript</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>折腾 Hexo</title>
+    <url>/posts/others/hexo/</url>
+    <content><![CDATA[<p>记一下避免<span class="emoji" alias="chipmunk" style="" fallback-src="https://github.githubassets.com/images/icons/emoji/unicode/1f43f.png?v8">&#x1f43f;</span>行为</p>
+<span id="more"></span>
+
+<h2 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h2><p>全局装命令行，初始化</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">npm install -g hexo-cli</span><br><span class="line">hexo init lsy-0xcc.github.io</span><br></pre></td></tr></table></figure>
+
+<p>进入文件夹，安装插件</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">cd lsy-0xcc.github.io</span><br><span class="line">yarn add hexo-image-link hexo-theme-next hexo-filter-emoji hexo-deployer-git hexo-generator-searchdb</span><br></pre></td></tr></table></figure>
+
+<h2 id="配置"><a href="#配置" class="headerlink" title="配置"></a>配置</h2><h3 id="配置文件"><a href="#配置文件" class="headerlink" title="配置文件"></a>配置文件</h3><p><code>_config.yml</code></p>
+<figure class="highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="comment"># Site</span></span><br><span class="line"><span class="attr">title:</span> <span class="string">李西西的备忘录</span></span><br><span class="line"><span class="attr">subtitle:</span> <span class="string">&quot;&quot;</span></span><br><span class="line"><span class="attr">description:</span> <span class="string">&quot;&quot;</span></span><br><span class="line"><span class="attr">keywords:</span></span><br><span class="line"><span class="attr">author:</span> <span class="string">李西西</span></span><br><span class="line"><span class="attr">language:</span> <span class="string">zh-CN</span></span><br><span class="line"><span class="attr">timezone:</span> <span class="string">&quot;&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># URL</span></span><br><span class="line"><span class="comment">## If your site is put in a subdirectory, set url as &#x27;http://example.com/child&#x27; and root as &#x27;/child/&#x27;</span></span><br><span class="line"><span class="attr">url:</span> <span class="string">https://lsy-0xcc@github.io</span></span><br><span class="line"><span class="attr">root:</span> <span class="string">/</span></span><br><span class="line"><span class="comment"># permalink: :year/:month/:day/:title/</span></span><br><span class="line"><span class="attr">permalink:</span> <span class="string">posts/:title/</span></span><br><span class="line"><span class="attr">permalink_defaults:</span></span><br><span class="line"><span class="attr">pretty_urls:</span></span><br><span class="line">  <span class="attr">trailing_index:</span> <span class="literal">true</span> <span class="comment"># Set to false to remove trailing &#x27;index.html&#x27; from permalinks</span></span><br><span class="line">  <span class="attr">trailing_html:</span> <span class="literal">true</span> <span class="comment"># Set to false to remove trailing &#x27;.html&#x27; from permalinks</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 注意这里</span></span><br><span class="line"><span class="attr">post_asset_folder:</span> <span class="literal">true</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># Extensions</span></span><br><span class="line"><span class="comment">## Plugins: https://hexo.io/plugins/</span></span><br><span class="line"><span class="comment">## Themes: https://hexo.io/themes/</span></span><br><span class="line"><span class="attr">theme:</span> <span class="string">next</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># Deployment</span></span><br><span class="line"><span class="comment">## Docs: https://hexo.io/docs/one-command-deployment</span></span><br><span class="line"><span class="attr">deploy:</span></span><br><span class="line">  <span class="bullet">-</span> <span class="attr">type:</span> <span class="string">git</span></span><br><span class="line">    <span class="attr">repo:</span> <span class="string">git@github.com:lsy-0xcc/lsy-0xcc.github.io.git</span></span><br><span class="line">    <span class="attr">branch:</span> <span class="string">github-pages</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 内置搜索</span></span><br><span class="line"><span class="attr">search:</span></span><br><span class="line">  <span class="attr">path:</span> <span class="string">search.xml</span></span><br><span class="line">  <span class="attr">field:</span> <span class="string">post</span></span><br><span class="line">  <span class="attr">content:</span> <span class="literal">true</span></span><br><span class="line">  <span class="attr">format:</span> <span class="string">html</span></span><br></pre></td></tr></table></figure>
+
+<p><code>_config.next.yml</code></p>
+<figure class="highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="comment"># scheme: Muse</span></span><br><span class="line"><span class="comment"># scheme: Mist</span></span><br><span class="line"><span class="attr">scheme:</span> <span class="string">Pisces</span></span><br><span class="line"><span class="comment"># scheme: Gemini</span></span><br><span class="line"><span class="attr">language:</span> <span class="string">zh-CN</span></span><br><span class="line"><span class="attr">footer:</span></span><br><span class="line">  <span class="attr">since:</span> <span class="number">2020</span></span><br><span class="line">  <span class="attr">powered:</span> <span class="literal">false</span></span><br><span class="line">  <span class="attr">icon:</span></span><br><span class="line">    <span class="comment"># name: fa fa-user</span></span><br><span class="line">    <span class="attr">animated:</span> <span class="literal">true</span></span><br><span class="line">    <span class="comment"># color: &quot;#808080&quot;</span></span><br><span class="line">  <span class="comment"># beian:</span></span><br><span class="line">  <span class="comment">#   enable: true</span></span><br><span class="line">  <span class="comment">#   icp: 黑ICP备 20000491号-1</span></span><br><span class="line">  <span class="comment">#   gongan_id: 23010302000977</span></span><br><span class="line">  <span class="comment">#   gongan_num: 黑公网安备 23010302000977号</span></span><br><span class="line">  <span class="comment">#   gongan_icon_url: http://static.lsy99.cn/公安.svg</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 何时显示菜单栏</span></span><br><span class="line"><span class="attr">sidebar:</span></span><br><span class="line">  <span class="comment"># display: post</span></span><br><span class="line">  <span class="attr">display:</span> <span class="string">always</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 侧边菜单栏</span></span><br><span class="line"><span class="attr">menu:</span></span><br><span class="line">  <span class="attr">home:</span> <span class="string">/</span> <span class="string">||</span> <span class="string">fa</span> <span class="string">fa-home</span></span><br><span class="line">  <span class="attr">archives:</span> <span class="string">/archives/</span> <span class="string">||</span> <span class="string">fa</span> <span class="string">fa-archive</span></span><br><span class="line">  <span class="attr">tags:</span> <span class="string">/tags/</span> <span class="string">||</span> <span class="string">fa</span> <span class="string">fa-tags</span></span><br><span class="line">  <span class="attr">categories:</span> <span class="string">/categories/</span> <span class="string">||</span> <span class="string">fa</span> <span class="string">fa-th</span></span><br><span class="line">  <span class="attr">about:</span> <span class="string">/about/</span> <span class="string">||</span> <span class="string">fa</span> <span class="string">fa-user</span></span><br><span class="line">  <span class="comment"># sitemap: /sitemap.xml || fa fa-sitemap</span></span><br><span class="line">  <span class="comment"># schedule: /schedule/ || fa fa-calendar</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 标签云</span></span><br><span class="line"><span class="attr">tagcloud:</span></span><br><span class="line">  <span class="attr">min:</span> <span class="number">12</span> <span class="comment"># Minimun font size in px</span></span><br><span class="line">  <span class="attr">max:</span> <span class="number">36</span> <span class="comment"># Maxium font size in px</span></span><br><span class="line">  <span class="comment"># amount: 200 # Total amount of tags</span></span><br><span class="line">  <span class="comment"># orderby: name # Order of tags</span></span><br><span class="line">  <span class="comment"># order: 1 # Sort order</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 侧边栏头像</span></span><br><span class="line"><span class="attr">avatar:</span></span><br><span class="line">  <span class="attr">url:</span> <span class="string">/images/avatar.png</span></span><br><span class="line">  <span class="comment"># 圆的</span></span><br><span class="line">  <span class="comment"># rounded: true</span></span><br><span class="line">  <span class="comment"># 旋转</span></span><br><span class="line">  <span class="comment"># rotated: true</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 侧边栏 社交</span></span><br><span class="line"><span class="attr">social:</span></span><br><span class="line">  <span class="attr">GitHub:</span> <span class="string">https://github.com/lsy-0xcc</span> <span class="string">||</span> <span class="string">fab</span> <span class="string">fa-github</span></span><br><span class="line">  <span class="attr">E-Mail:</span> <span class="string">mailto:lsy114514@hotmail.com</span> <span class="string">||</span> <span class="string">fa</span> <span class="string">fa-envelope</span></span><br><span class="line">  <span class="comment"># Weibo: https://weibo.com/yourname || fab fa-weibo</span></span><br><span class="line">  <span class="comment"># Google: https://plus.google.com/yourname || fab fa-google</span></span><br><span class="line">  <span class="comment"># Twitter: https://twitter.com/yourname || fab fa-twitter</span></span><br><span class="line">  <span class="comment"># FB Page: https://www.facebook.com/yourname || fab fa-facebook</span></span><br><span class="line">  <span class="comment"># StackOverflow: https://stackoverflow.com/yourname || fab fa-stack-overflow</span></span><br><span class="line">  <span class="comment"># YouTube: https://youtube.com/yourname || fab fa-youtube</span></span><br><span class="line">  <span class="comment"># Instagram: https://instagram.com/yourname || fab fa-instagram</span></span><br><span class="line">  <span class="comment"># Skype: skype:yourname?call|chat || fab fa-skype</span></span><br><span class="line"><span class="attr">social_icons:</span></span><br><span class="line">  <span class="attr">enable:</span> <span class="literal">true</span></span><br><span class="line">  <span class="attr">icons_only:</span> <span class="literal">false</span></span><br><span class="line">  <span class="attr">transition:</span> <span class="literal">true</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># Github 章鱼猫</span></span><br><span class="line"><span class="attr">github_banner:</span></span><br><span class="line">  <span class="attr">enable:</span> <span class="literal">true</span></span><br><span class="line">  <span class="attr">permalink:</span> <span class="string">https://github.com/lsy-0xcc</span></span><br><span class="line">  <span class="attr">title:</span> <span class="string">Follow</span> <span class="string">me</span> <span class="string">on</span> <span class="string">GitHub</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 阅读进度条</span></span><br><span class="line"><span class="attr">reading_progress:</span></span><br><span class="line">  <span class="attr">enable:</span> <span class="literal">true</span></span><br><span class="line">  <span class="comment"># color: &quot;#FC6423&quot;</span></span><br><span class="line">  <span class="attr">color:</span> <span class="string">&quot;#222222&quot;</span></span><br><span class="line">  <span class="attr">height:</span> <span class="string">2px</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 回到顶部</span></span><br><span class="line"><span class="attr">back2top:</span></span><br><span class="line">  <span class="attr">enable:</span> <span class="literal">true</span></span><br><span class="line">  <span class="attr">scrollpercent:</span> <span class="literal">true</span></span><br><span class="line">  <span class="comment"># sidebar: true</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># tag从井号换图标</span></span><br><span class="line"><span class="attr">tag_icon:</span> <span class="literal">true</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 谷歌日历</span></span><br><span class="line"><span class="comment"># calendar:</span></span><br><span class="line"><span class="comment">#   calendar_id:</span></span><br><span class="line"><span class="comment">#   api_key:</span></span><br><span class="line"><span class="comment">#   orderBy: startTime</span></span><br><span class="line"><span class="comment">#   showLocation: false</span></span><br><span class="line"><span class="comment">#   offsetMax: 72</span></span><br><span class="line"><span class="comment">#   offsetMin: 4</span></span><br><span class="line"><span class="comment">#   showDeleted: false</span></span><br><span class="line"><span class="comment">#   singleEvents: true</span></span><br><span class="line"><span class="comment">#   maxResults: 250</span></span><br><span class="line"></span><br><span class="line"><span class="attr">toc:</span></span><br><span class="line">  <span class="attr">number:</span> <span class="literal">false</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># Local search</span></span><br><span class="line"><span class="comment"># Dependencies: https://github.com/next-theme/hexo-generator-searchdb</span></span><br><span class="line"><span class="attr">local_search:</span></span><br><span class="line">  <span class="attr">enable:</span> <span class="literal">true</span></span><br><span class="line">  <span class="comment"># If auto, trigger search by changing input.</span></span><br><span class="line">  <span class="comment"># If manual, trigger search by pressing enter key or search button.</span></span><br><span class="line">  <span class="attr">trigger:</span> <span class="string">auto</span></span><br><span class="line">  <span class="comment"># Show top n results per article, show all results by setting to -1</span></span><br><span class="line">  <span class="attr">top_n_per_article:</span> <span class="number">1</span></span><br><span class="line">  <span class="comment"># Unescape html strings to the readable one.</span></span><br><span class="line">  <span class="attr">unescape:</span> <span class="literal">false</span></span><br><span class="line">  <span class="comment"># Preload the search data when the page loads.</span></span><br><span class="line">  <span class="attr">preload:</span> <span class="literal">false</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 查看大图</span></span><br><span class="line"><span class="attr">fancybox:</span> <span class="literal">true</span></span><br><span class="line"><span class="attr">vendors:</span></span><br><span class="line">  <span class="attr">fancybox:</span> <span class="string">//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js</span></span><br><span class="line">  <span class="attr">fancybox_css:</span> <span class="string">//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css</span></span><br><span class="line"></span><br><span class="line"><span class="attr">favicon:</span></span><br><span class="line">  <span class="attr">small:</span> <span class="string">/images/favicon/favicon-16x16.png</span></span><br><span class="line">  <span class="attr">medium:</span> <span class="string">/images/favicon/favicon-32x32.png</span></span><br><span class="line">  <span class="attr">apple_touch_icon:</span> <span class="string">/images/favicon/apple-touch-icon.png</span></span><br><span class="line">  <span class="attr">safari_pinned_tab:</span> <span class="string">/images/favicon/safari-pinned-tab.svg</span></span><br><span class="line">  <span class="attr">android_manifest:</span> <span class="string">/images/favicon/manifest.json</span></span><br><span class="line">  <span class="attr">ms_browserconfig:</span> <span class="string">/images/favicon/browserconfig.xml</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="其他文件"><a href="#其他文件" class="headerlink" title="其他文件"></a>其他文件</h3><img src="/posts/others/hexo/image-20220122201645087.png" class="" title="其他文件结构">
+
+<p><code>about.md</code></p>
+<figure class="highlight markdown"><table><tr><td class="code"><pre><span class="line">---</span><br><span class="line">title: 关于</span><br><span class="line">date: 2020-10-18 12:00:53</span><br><span class="line">updated: 2020-10-18 12:00:53</span><br><span class="line"><span class="section">tags:</span></span><br><span class="line"><span class="section">---</span></span><br><span class="line"></span><br><span class="line"><span class="emoji" alias="smile" style="" fallback-src="https://github.githubassets.com/images/icons/emoji/unicode/1f604.png?v8">&#x1f604;</span></span><br></pre></td></tr></table></figure>
+
+<p><code>categories.md</code></p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">---</span><br><span class="line">title: 分类</span><br><span class="line">date: 1999-02-04 12:58:00</span><br><span class="line">type: categories</span><br><span class="line">---</span><br></pre></td></tr></table></figure>
+
+<p><code>tags.md</code></p>
+<figure class="highlight markdown"><table><tr><td class="code"><pre><span class="line">---</span><br><span class="line">title: 标签</span><br><span class="line">date: 1999-02-04 12:58:00</span><br><span class="line"><span class="section">type: tags</span></span><br><span class="line"><span class="section">---</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="配置-Typora"><a href="#配置-Typora" class="headerlink" title="配置 Typora"></a>配置 Typora</h3><p>传图片复制一份到对应文件夹里</p>
+<img src="/posts/others/hexo/image-20220122201145718.png" class="" title="Typora 设置">
+
+<h2 id="写东西"><a href="#写东西" class="headerlink" title="写东西"></a>写东西</h2><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">hexo new page hexo --path /front-end/hexo</span><br></pre></td></tr></table></figure>
+
+<p>指定文件位置方便管理</p>
+<h2 id="预览"><a href="#预览" class="headerlink" title="预览"></a>预览</h2><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">hexo serve</span><br></pre></td></tr></table></figure>
+
+<h2 id="部署"><a href="#部署" class="headerlink" title="部署"></a>部署</h2><h3 id="GitHub-Pages"><a href="#GitHub-Pages" class="headerlink" title="GitHub Pages"></a>GitHub Pages</h3><p>新建个仓库叫 用户名.github.io</p>
+<p>settings-&gt;pages-&gt;选分支</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">hexo deploy</span><br></pre></td></tr></table></figure>
+
+<h3 id="服务器"><a href="#服务器" class="headerlink" title="服务器"></a>服务器</h3><p>等填坑</p>
+]]></content>
+      <categories>
+        <category>其他</category>
+        <category>Hexo</category>
+      </categories>
+      <tags>
+        <tag>Hexo</tag>
+        <tag>Markdown</tag>
+      </tags>
+  </entry>
+</search>
