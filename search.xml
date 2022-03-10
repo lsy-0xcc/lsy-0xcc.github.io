@@ -1,6 +1,65 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title>JavaScript 扩展运算符(...) 解构赋值 函数调用</title>
+    <url>/posts/front-end/JavaScript-spread/</url>
+    <content><![CDATA[<h2 id="长求总"><a href="#长求总" class="headerlink" title="长求总"></a>长求总</h2><ul>
+<li>解构赋值</li>
+<li>函数的 rest 参数和 spread 语法</li>
+<li>适用于对象和数组</li>
+<li>用来折腾复杂的对象或者数组，或者用来定义参数特别多特别乱的函数</li>
+</ul>
+<span id="more"></span>
+
+<h2 id="解构赋值"><a href="#解构赋值" class="headerlink" title="解构赋值"></a>解构赋值</h2><h3 id="数组解构"><a href="#数组解构" class="headerlink" title="数组解构"></a>数组解构</h3><figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line"><span class="keyword">let</span>[firstName, secondName] = [<span class="string">&quot;John&quot;</span>, <span class="string">&quot;Doe&quot;</span>];</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><p>意味着复制一个新的，不破坏</p>
+</li>
+<li><p>可以用逗号忽略</p>
+<figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 不需要第二个元素</span></span><br><span class="line"><span class="keyword">let</span> [firstName, , title] = [<span class="string">&quot;Julius&quot;</span>, <span class="string">&quot;Caesar&quot;</span>, <span class="string">&quot;Consul&quot;</span>, <span class="string">&quot;of the Roman Republic&quot;</span>];</span><br><span class="line">alert( title ); <span class="comment">// Consul</span></span><br></pre></td></tr></table></figure></li>
+<li><p>等号右侧可以是任何可迭代对象</p>
+</li>
+<li><p>赋值给等号左侧的任何内容</p>
+</li>
+<li><p>与 .entries() 方法进行循环操作</p>
+</li>
+<li><p>交换变量值的技巧<code>[guest, admin] = [admin, guest];</code></p>
+</li>
+</ul>
+<h4 id="剩余元素"><a href="#剩余元素" class="headerlink" title="剩余元素"></a>剩余元素</h4><p>这里用了<strong>三个点</strong>，剩下的东西扔数组里</p>
+<figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line"><span class="keyword">let</span> [name1, name2, ...rest] = [<span class="string">&quot;Julius&quot;</span>, <span class="string">&quot;Caesar&quot;</span>, <span class="string">&quot;Consul&quot;</span>, <span class="string">&quot;of the Roman Republic&quot;</span>];</span><br><span class="line"></span><br><span class="line">alert(name1); <span class="comment">// Julius</span></span><br><span class="line">alert(name2); <span class="comment">// Caesar</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 请注意，`rest` 的类型是数组</span></span><br><span class="line">alert(rest[<span class="number">0</span>]); <span class="comment">// Consul</span></span><br><span class="line">alert(rest[<span class="number">1</span>]); <span class="comment">// of the Roman Republic</span></span><br><span class="line">alert(rest.length); <span class="comment">// 2</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="默认值"><a href="#默认值" class="headerlink" title="默认值"></a>默认值</h4><figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 默认值</span></span><br><span class="line"><span class="keyword">let</span> [name = <span class="string">&quot;Guest&quot;</span>, surname = <span class="string">&quot;Anonymous&quot;</span>] = [<span class="string">&quot;Julius&quot;</span>];</span><br><span class="line"></span><br><span class="line">alert(name);    <span class="comment">// Julius（来自数组的值）</span></span><br><span class="line">alert(surname); <span class="comment">// Anonymous（默认值被使用了）</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="数组展开"><a href="#数组展开" class="headerlink" title="数组展开"></a>数组展开</h4><p>这里用了<strong>三个点</strong>，相当于把数组打开成单个元素</p>
+<figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line"><span class="keyword">let</span> array = [<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>]</span><br><span class="line"><span class="keyword">let</span> newArray = [<span class="number">4</span>,<span class="number">5</span>,...array,<span class="number">6</span>,...<span class="string">&quot;hello&quot;</span>] <span class="comment">// [4, 5, 1, 2, 3, 6, &#x27;h&#x27;, &#x27;e&#x27;, &#x27;l&#x27;, &#x27;l&#x27;, &#x27;o&#x27;]</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="对象解构"><a href="#对象解构" class="headerlink" title="对象解构"></a>对象解构</h3><figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line"><span class="keyword">let</span> &#123;var1, var2&#125; = &#123;<span class="attr">var1</span>:…, <span class="attr">var2</span>:…&#125;</span><br><span class="line"><span class="comment">// var1 var2 可以换位置，不影响结果。</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 自定义变量名</span></span><br><span class="line"><span class="keyword">let</span> options = &#123;</span><br><span class="line">  <span class="attr">title</span>: <span class="string">&quot;Menu&quot;</span>,</span><br><span class="line">  <span class="attr">width</span>: <span class="number">100</span>,</span><br><span class="line">  <span class="attr">height</span>: <span class="number">200</span></span><br><span class="line">&#125;;</span><br><span class="line"><span class="comment">// &#123; 对象属性: 变量名 &#125;</span></span><br><span class="line"><span class="keyword">let</span> &#123;<span class="attr">width</span>: w, <span class="attr">height</span>: h, title&#125; = options <span class="comment">// ;</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="剩余元素-1"><a href="#剩余元素-1" class="headerlink" title="剩余元素"></a>剩余元素</h4><figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line"><span class="keyword">let</span> options = &#123;</span><br><span class="line">  <span class="attr">title</span>: <span class="string">&quot;Menu&quot;</span>,</span><br><span class="line">  <span class="attr">width</span>: <span class="number">100</span>,</span><br><span class="line">  <span class="attr">height</span>: <span class="number">200</span></span><br><span class="line">&#125;;</span><br><span class="line"><span class="keyword">let</span> &#123;title, ...shape&#125; = options;</span><br></pre></td></tr></table></figure>
+
+<h4 id="默认值-1"><a href="#默认值-1" class="headerlink" title="默认值"></a>默认值</h4><figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line"><span class="keyword">let</span> options = &#123;</span><br><span class="line">  <span class="attr">title</span>: <span class="string">&quot;Menu&quot;</span></span><br><span class="line">&#125;;</span><br><span class="line"><span class="keyword">let</span> &#123;width = <span class="number">100</span>, height = <span class="number">200</span>, title&#125; = options;</span><br></pre></td></tr></table></figure>
+
+<h4 id="对象展开"><a href="#对象展开" class="headerlink" title="对象展开"></a>对象展开</h4><p>这里用了<strong>三个点</strong>，相当于把对象摊平</p>
+<figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line"><span class="keyword">let</span> shape = &#123;<span class="attr">width</span>:<span class="number">16</span>, <span class="attr">height</span>:<span class="number">9</span>&#125;</span><br><span class="line"><span class="keyword">let</span> square = &#123;<span class="attr">title</span>:<span class="string">&quot;I&#x27;m square&quot;</span>, ...shape&#125; <span class="comment">// &#123;title: &quot;I&#x27;m square&quot;, width: 16, height: 9&#125;</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="关于函数"><a href="#关于函数" class="headerlink" title="关于函数"></a>关于函数</h2><h3 id="Rest-参数与-Spread-语法"><a href="#Rest-参数与-Spread-语法" class="headerlink" title="Rest 参数与 Spread 语法"></a>Rest 参数与 Spread 语法</h3><ul>
+<li>若 … 出现在函数参数列表的最后，那么它就是 rest 参数，它会把参数列表中剩余的参数收集到一个数组中。</li>
+<li>若 … 出现在函数调用或类似的表达式中，那它就是 spread 语法，它会把一个数组展开为列表。</li>
+</ul>
+<h3 id="智能函数参数"><a href="#智能函数参数" class="headerlink" title="智能函数参数"></a>智能函数参数</h3><p>和解构对象相同</p>
+<figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line"><span class="keyword">let</span> options = &#123;</span><br><span class="line">  <span class="attr">title</span>: <span class="string">&quot;My menu&quot;</span>,</span><br><span class="line">  <span class="attr">items</span>: [<span class="string">&quot;Item1&quot;</span>, <span class="string">&quot;Item2&quot;</span>]</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">showMenu</span>(<span class="params">&#123;</span></span></span><br><span class="line"><span class="params"><span class="function">  title = <span class="string">&quot;Untitled&quot;</span>,</span></span></span><br><span class="line"><span class="params"><span class="function">  width: w = <span class="number">100</span>,  <span class="regexp">//</span> width goes to w</span></span></span><br><span class="line"><span class="params"><span class="function">  height: h = <span class="number">200</span>, <span class="regexp">//</span> height goes to h</span></span></span><br><span class="line"><span class="params"><span class="function">  items: [item1, item2] <span class="regexp">//</span> items first element goes to item1, second to item2</span></span></span><br><span class="line"><span class="params"><span class="function">&#125;</span>) </span>&#123;</span><br><span class="line">  alert( <span class="string">`<span class="subst">$&#123;title&#125;</span> <span class="subst">$&#123;w&#125;</span> <span class="subst">$&#123;h&#125;</span>`</span> ); <span class="comment">// My Menu 100 200</span></span><br><span class="line">  alert( item1 ); <span class="comment">// Item1</span></span><br><span class="line">  alert( item2 ); <span class="comment">// Item2</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">showMenu(options);</span><br></pre></td></tr></table></figure>
+]]></content>
+      <categories>
+        <category>前端</category>
+        <category>JavaSript</category>
+      </categories>
+      <tags>
+        <tag>JavaScript</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>Git 单独忽略某一行</title>
     <url>/posts/devops/git-ignore-line/</url>
     <content><![CDATA[<p>Git 提交时又是会有文件中包含敏感信息，比如密码，或者用于测试的配置不想提交。而yaml文件不支持导入另一个yaml文件，若全部忽略跟着很麻烦。</p>
@@ -59,62 +118,117 @@
       </tags>
   </entry>
   <entry>
-    <title>JavaScript 扩展运算符(...) 解构赋值 函数调用</title>
-    <url>/posts/front-end/JavaScript-spread/</url>
-    <content><![CDATA[<h2 id="长求总"><a href="#长求总" class="headerlink" title="长求总"></a>长求总</h2><ul>
-<li>解构赋值</li>
-<li>函数的 rest 参数和 spread 语法</li>
-<li>适用于对象和数组</li>
-<li>用来折腾复杂的对象或者数组，或者用来定义参数特别多特别乱的函数</li>
+    <title>Angular 笔记</title>
+    <url>/posts/front-end/Angular/</url>
+    <content><![CDATA[<h1 id="Angular"><a href="#Angular" class="headerlink" title="Angular"></a>Angular</h1><h2 id="基本概念"><a href="#基本概念" class="headerlink" title="基本概念"></a>基本概念</h2><ol>
+<li><p>YAGNI You Arn’t Gonna Need It.</p>
+</li>
+<li><p>dry Don’t Repeat Yourself.</p>
+</li>
+<li><p>对扩展开放，对修改封闭</p>
+</li>
+<li><p>高内聚低耦合</p>
+</li>
+<li><p>最少知识原则</p>
+</li>
+</ol>
+<h2 id="基础概念"><a href="#基础概念" class="headerlink" title="基础概念"></a>基础概念</h2><p>只能通过脚手架构建</p>
+<img src="/posts/front-end/Angular/2022-03-06-21-07-01-image.png" class="">
+
+<img src="/posts/front-end/Angular/2022-03-06-21-14-15-image.png" class="">
+
+<img src="/posts/front-end/Angular/2022-03-06-21-07-28-image.png" class="">
+
+<img src="/posts/front-end/Angular/2022-03-06-21-05-48-image.png" class="">
+
+<p>模块是抽象透明的容器</p>
+<p>主模块（APP）有且只有一个</p>
+<h2 id="备忘"><a href="#备忘" class="headerlink" title="备忘"></a>备忘</h2><ul>
+<li><p>路径既可以以根目录为根，也可以以当前位置为根或以模块为根</p>
+</li>
+<li><p>元素中的#表示编号，只有angular能使用，不是给html用 表示template reference</p>
+</li>
+<li><p>ng-template 不会渲染到dom树 是透明的</p>
+</li>
+<li><p>ng-template 与 ng-container 的区别：template里面得有结构化指令或者tenplate编号，没有不渲染，ng-cotainer 就是无辜的透明的</p>
+</li>
 </ul>
-<span id="more"></span>
+<h2 id="组件"><a href="#组件" class="headerlink" title="组件"></a>组件</h2><img src="/posts/front-end/Angular/2022-03-06-21-13-36-image.png" class="">
 
-<h2 id="解构赋值"><a href="#解构赋值" class="headerlink" title="解构赋值"></a>解构赋值</h2><h3 id="数组解构"><a href="#数组解构" class="headerlink" title="数组解构"></a>数组解构</h3><figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line"><span class="keyword">let</span>[firstName, secondName] = [<span class="string">&quot;John&quot;</span>, <span class="string">&quot;Doe&quot;</span>];</span><br></pre></td></tr></table></figure>
+<h3 id="创建"><a href="#创建" class="headerlink" title="创建"></a>创建</h3><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">ng g component component-name</span><br></pre></td></tr></table></figure>
 
+<p>横线分割单词</p>
+<p>在哪个module的文件夹下就创建在哪个module里，不在任何module下就在默认</p>
+<h3 id="基本状态"><a href="#基本状态" class="headerlink" title="基本状态"></a>基本状态</h3><p>多文件组件：使用 templateUrl 和 styleUrls</p>
+<figure class="highlight typescript"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Component</span>(&#123;</span><br><span class="line">  <span class="attr">selector</span>: <span class="string">&#x27;app-my-com&#x27;</span>,</span><br><span class="line">  <span class="attr">templateUrl</span>: <span class="string">&#x27;./my-com.component.html&#x27;</span>,</span><br><span class="line">  <span class="attr">styleUrls</span>: [<span class="string">&#x27;./my-com.component.scss&#x27;</span>]</span><br><span class="line">&#125;) </span><br><span class="line"><span class="keyword">export</span> <span class="class"><span class="keyword">class</span> <span class="title">MyComComponent</span> <span class="title">implements</span> <span class="title">OnInit</span> </span>&#123;</span><br><span class="line">  <span class="function"><span class="title">constructor</span>(<span class="params"></span>)</span> &#123; &#125;</span><br><span class="line">  ngOnInit(): <span class="built_in">void</span> &#123;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="绑定"><a href="#绑定" class="headerlink" title="绑定"></a>绑定</h3><h4 id="归纳"><a href="#归纳" class="headerlink" title="归纳"></a>归纳</h4><p>Model-&gt;View 改变属性 []</p>
+<p>View-&gt;Model 触发事件 ()</p>
+<p>双向绑定 [()]</p>
+<h4 id="绑定HTML"><a href="#绑定HTML" class="headerlink" title="绑定HTML"></a>绑定HTML</h4><figure class="highlight html"><table><tr><td class="code"><pre><span class="line">&#123;&#123;NG表达式&#125;&#125;</span><br></pre></td></tr></table></figure>
+
+<p>NG表达式能各种运算</p>
+<p>不能new 对象</p>
+<p>不能用JSON对象</p>
+<p>就是不能有副作用</p>
+<h4 id="绑定数据"><a href="#绑定数据" class="headerlink" title="绑定数据"></a>绑定数据</h4><figure class="highlight html"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">p</span> <span class="attr">attribute</span>=<span class="string">&quot;&#123;&#123;value&#125;&#125;&quot;</span>&gt;</span>text<span class="tag">&lt;/<span class="name">p</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">p</span> [<span class="attr">attribute</span>]=<span class="string">&quot;value&quot;</span>&gt;</span>text<span class="tag">&lt;/<span class="name">p</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>里面也可以是NG表达式</p>
+<h4 id="绑定事件"><a href="#绑定事件" class="headerlink" title="绑定事件"></a>绑定事件</h4><figure class="highlight html"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">p</span> (<span class="attr">event</span> <span class="attr">name</span>)=<span class="string">&quot;func()&quot;</span>&gt;</span>text<span class="tag">&lt;/<span class="name">p</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">p</span> (<span class="attr">event</span> <span class="attr">name</span>)=<span class="string">&quot;func($event)&quot;</span>&gt;</span>text<span class="tag">&lt;/<span class="name">p</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>函数一定要加括号</p>
+<h4 id="绑定样式-style"><a href="#绑定样式-style" class="headerlink" title="绑定样式 style"></a>绑定样式 style</h4><figure class="highlight html"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">nav</span> [<span class="attr">style.background-color</span>]=<span class="string">&quot;expression&quot;</span>&gt;</span><span class="tag">&lt;/<span class="name">nav</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">nav</span> [<span class="attr">style.backgroundColor</span>]=<span class="string">&quot;expression&quot;</span>&gt;</span><span class="tag">&lt;/<span class="name">nav</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>可以用小驼峰，也可以连字符</p>
+<p>ngStyle 不再提供显著价值，将来可能会被删除。(等于多重样式绑定的最后一种)</p>
+<p><strong>当把 <code>[style]</code> 绑定到对象表达式时，该对象的引用必须改变，这样 Angular 才能更新这个类列表。在不改变对象引用的情况下更新其属性值是不会生效的。</strong></p>
+<img src="/posts/front-end/Angular/2022-03-08-21-18-37-image.png" class="">
+
+<h4 id="绑定类-class"><a href="#绑定类-class" class="headerlink" title="绑定类 class"></a>绑定类 class</h4><p>要创建单个类绑定，请使用前缀 <code>class</code> 后跟一个点和 CSS 类的名称，例如 <code>[class.sale]=&quot;onSale&quot;</code>。<code>onSale</code> 为真值时添加类，在表达式为假值时（<code>undefined</code> 除外）删除类。</p>
+<p>要绑定到多个类，请使用 <code>[class]</code> 来设置表达式 - 例如，<code>[class]=&quot;classExpression&quot;</code>，此表达式可以取如下值：</p>
 <ul>
-<li><p>意味着复制一个新的，不破坏</p>
+<li><p>用空格分隔的类名字符串</p>
 </li>
-<li><p>可以用逗号忽略</p>
-<figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 不需要第二个元素</span></span><br><span class="line"><span class="keyword">let</span> [firstName, , title] = [<span class="string">&quot;Julius&quot;</span>, <span class="string">&quot;Caesar&quot;</span>, <span class="string">&quot;Consul&quot;</span>, <span class="string">&quot;of the Roman Republic&quot;</span>];</span><br><span class="line">alert( title ); <span class="comment">// Consul</span></span><br></pre></td></tr></table></figure></li>
-<li><p>等号右侧可以是任何可迭代对象</p>
+<li><p>以类名作为键名并将真或假表达式作为值的对象。</p>
 </li>
-<li><p>赋值给等号左侧的任何内容</p>
-</li>
-<li><p>与 .entries() 方法进行循环操作</p>
-</li>
-<li><p>交换变量值的技巧<code>[guest, admin] = [admin, guest];</code></p>
+<li><p>类名的数组。</p>
 </li>
 </ul>
-<h4 id="剩余元素"><a href="#剩余元素" class="headerlink" title="剩余元素"></a>剩余元素</h4><p>这里用了<strong>三个点</strong>，剩下的东西扔数组里</p>
-<figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line"><span class="keyword">let</span> [name1, name2, ...rest] = [<span class="string">&quot;Julius&quot;</span>, <span class="string">&quot;Caesar&quot;</span>, <span class="string">&quot;Consul&quot;</span>, <span class="string">&quot;of the Roman Republic&quot;</span>];</span><br><span class="line"></span><br><span class="line">alert(name1); <span class="comment">// Julius</span></span><br><span class="line">alert(name2); <span class="comment">// Caesar</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 请注意，`rest` 的类型是数组</span></span><br><span class="line">alert(rest[<span class="number">0</span>]); <span class="comment">// Consul</span></span><br><span class="line">alert(rest[<span class="number">1</span>]); <span class="comment">// of the Roman Republic</span></span><br><span class="line">alert(rest.length); <span class="comment">// 2</span></span><br></pre></td></tr></table></figure>
+<p><strong>对于任何类似对象的表达式（例如 <code>object</code>、<code>Array</code>、<code>Map</code> 或 <code>Set</code>，必须更改对象的引用，Angular 才能更新类列表。在不更改对象引用的情况下只更新其 Attribute 是不会生效的。</strong><img src="/posts/front-end/Angular/2022-03-07-23-11-52-image.png" class=""></p>
+<h4 id="双向绑定"><a href="#双向绑定" class="headerlink" title="双向绑定"></a>双向绑定</h4><ol>
+<li><strong>导入 <code>[FormsModule]</code>，并将其添加到 NgModule 的 <code>imports</code> 列表中。</strong></li>
+<li>在 HTML 的 <code>&lt;form&gt;</code> 元素上添加 <code>[(ngModel)]</code> 绑定，并将其设置为等于此属性</li>
+</ol>
+<figure class="highlight html"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">label</span> <span class="attr">for</span>=<span class="string">&quot;example-ngModel&quot;</span>&gt;</span>[(ngModel)]:<span class="tag">&lt;/<span class="name">label</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">input</span> [(<span class="attr">ngModel</span>)]=<span class="string">&quot;currentItem.name&quot;</span> <span class="attr">id</span>=<span class="string">&quot;example-ngModel&quot;</span>&gt;</span></span><br></pre></td></tr></table></figure>
 
-<h4 id="默认值"><a href="#默认值" class="headerlink" title="默认值"></a>默认值</h4><figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 默认值</span></span><br><span class="line"><span class="keyword">let</span> [name = <span class="string">&quot;Guest&quot;</span>, surname = <span class="string">&quot;Anonymous&quot;</span>] = [<span class="string">&quot;Julius&quot;</span>];</span><br><span class="line"></span><br><span class="line">alert(name);    <span class="comment">// Julius（来自数组的值）</span></span><br><span class="line">alert(surname); <span class="comment">// Anonymous（默认值被使用了）</span></span><br></pre></td></tr></table></figure>
+<p>可以自定义事件</p>
+<figure class="highlight html"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">input</span> [<span class="attr">ngModel</span>]=<span class="string">&quot;currentItem.name&quot;</span> (<span class="attr">ngModelChange</span>)=<span class="string">&quot;setUppercaseName($event)&quot;</span> &gt;</span></span><br></pre></td></tr></table></figure>
 
-<h4 id="数组展开"><a href="#数组展开" class="headerlink" title="数组展开"></a>数组展开</h4><p>这里用了<strong>三个点</strong>，相当于把数组打开成单个元素</p>
-<figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line"><span class="keyword">let</span> array = [<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>]</span><br><span class="line"><span class="keyword">let</span> newArray = [<span class="number">4</span>,<span class="number">5</span>,...array,<span class="number">6</span>,...<span class="string">&quot;hello&quot;</span>] <span class="comment">// [4, 5, 1, 2, 3, 6, &#x27;h&#x27;, &#x27;e&#x27;, &#x27;l&#x27;, &#x27;l&#x27;, &#x27;o&#x27;]</span></span><br></pre></td></tr></table></figure>
+<h2 id="指令"><a href="#指令" class="headerlink" title="指令"></a>指令</h2><h3 id="归纳-1"><a href="#归纳-1" class="headerlink" title="归纳"></a>归纳</h3><p>指令</p>
+<ol>
+<li><p>组件：组件继承自Directive</p>
+</li>
+<li><p>结构型指令：会改变DOM树结构，以*开头，元素可能消失</p>
+</li>
+<li><p>属性型指令：不会改变DOM树结构，只改变元素外观，用[]扩上</p>
+</li>
+</ol>
+<h3 id="循环-ngFor"><a href="#循环-ngFor" class="headerlink" title="循环 ngFor"></a>循环 ngFor</h3><figure class="highlight html"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">li</span> *<span class="attr">ngFor</span>=<span class="string">&quot;let item of items; index as i; trackBy: trackByFn&quot;</span>&gt;</span>...<span class="tag">&lt;/<span class="name">li</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">ng-template</span> <span class="attr">ngFor</span> <span class="attr">let-item</span> [<span class="attr">ngForOf</span>]=<span class="string">&quot;items&quot;</span> <span class="attr">let-i</span>=<span class="string">&quot;index&quot;</span> [<span class="attr">ngForTrackBy</span>]=<span class="string">&quot;trackByFn&quot;</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">li</span>&gt;</span>...<span class="tag">&lt;/<span class="name">li</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">ng-template</span>&gt;</span></span><br></pre></td></tr></table></figure>
 
-<h3 id="对象解构"><a href="#对象解构" class="headerlink" title="对象解构"></a>对象解构</h3><figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line"><span class="keyword">let</span> &#123;var1, var2&#125; = &#123;<span class="attr">var1</span>:…, <span class="attr">var2</span>:…&#125;</span><br><span class="line"><span class="comment">// var1 var2 可以换位置，不影响结果。</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 自定义变量名</span></span><br><span class="line"><span class="keyword">let</span> options = &#123;</span><br><span class="line">  <span class="attr">title</span>: <span class="string">&quot;Menu&quot;</span>,</span><br><span class="line">  <span class="attr">width</span>: <span class="number">100</span>,</span><br><span class="line">  <span class="attr">height</span>: <span class="number">200</span></span><br><span class="line">&#125;;</span><br><span class="line"><span class="comment">// &#123; 对象属性: 变量名 &#125;</span></span><br><span class="line"><span class="keyword">let</span> &#123;<span class="attr">width</span>: w, <span class="attr">height</span>: h, title&#125; = options <span class="comment">// ;</span></span><br></pre></td></tr></table></figure>
+<p>trackByFn 用来获取 index</p>
+<h3 id="条件-ngIf"><a href="#条件-ngIf" class="headerlink" title="条件 ngIf"></a>条件 ngIf</h3><figure class="highlight html"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">div</span> *<span class="attr">ngIf</span>=<span class="string">&quot;condition&quot;</span>&gt;</span>Content to render when condition is true.<span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">ng-template</span> [<span class="attr">ngIf</span>]=<span class="string">&quot;condition&quot;</span>&gt;</span><span class="tag">&lt;<span class="name">div</span>&gt;</span>Content to render when condition is</span><br><span class="line">true.<span class="tag">&lt;/<span class="name">div</span>&gt;</span><span class="tag">&lt;/<span class="name">ng-template</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">div</span> *<span class="attr">ngIf</span>=<span class="string">&quot;condition; else elseBlock&quot;</span>&gt;</span>Content to render when condition is true.<span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">ng-template</span> #<span class="attr">elseBlock</span>&gt;</span>Content to render when condition is false.<span class="tag">&lt;/<span class="name">ng-template</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">id</span>=<span class="string">&quot;test&quot;</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">ng-template</span> *<span class="attr">ngIf</span>=<span class="string">&quot;isValid(); then content; else other_content&quot;</span></span></span><br><span class="line"><span class="tag">    &gt;</span>here is ignored<span class="tag">&lt;/<span class="name">ng-template</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">ng-template</span> #<span class="attr">content</span>&gt;</span>content here...<span class="tag">&lt;/<span class="name">ng-template</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">ng-template</span> #<span class="attr">other_content</span>&gt;</span>other content here...<span class="tag">&lt;/<span class="name">ng-template</span>&gt;</span></span><br></pre></td></tr></table></figure>
 
-<h4 id="剩余元素-1"><a href="#剩余元素-1" class="headerlink" title="剩余元素"></a>剩余元素</h4><figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line"><span class="keyword">let</span> options = &#123;</span><br><span class="line">  <span class="attr">title</span>: <span class="string">&quot;Menu&quot;</span>,</span><br><span class="line">  <span class="attr">width</span>: <span class="number">100</span>,</span><br><span class="line">  <span class="attr">height</span>: <span class="number">200</span></span><br><span class="line">&#125;;</span><br><span class="line"><span class="keyword">let</span> &#123;title, ...shape&#125; = options;</span><br></pre></td></tr></table></figure>
+<p>*ngIF 可以跟函数 then else 只能是 template</p>
+<h3 id="ngSwitch"><a href="#ngSwitch" class="headerlink" title="ngSwitch"></a>ngSwitch</h3><figure class="highlight html"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">container-element</span> [<span class="attr">ngSwitch</span>]=<span class="string">&quot;switch_expression&quot;</span>&gt;</span></span><br><span class="line">  <span class="comment">&lt;!-- the same view can be shown in more than one case --&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">some-element</span> *<span class="attr">ngSwitchCase</span>=<span class="string">&quot;match_expression_1&quot;</span>&gt;</span>...<span class="tag">&lt;/<span class="name">some-element</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">some-element</span> *<span class="attr">ngSwitchCase</span>=<span class="string">&quot;match_expression_2&quot;</span>&gt;</span>...<span class="tag">&lt;/<span class="name">some-element</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">some-other-element</span> *<span class="attr">ngSwitchCase</span>=<span class="string">&quot;match_expression_3&quot;</span>&gt;</span>...<span class="tag">&lt;/<span class="name">some-other-element</span>&gt;</span></span><br><span class="line">  <span class="comment">&lt;!--default case when there are no matches --&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">some-element</span> *<span class="attr">ngSwitchDefault</span>&gt;</span>...<span class="tag">&lt;/<span class="name">some-element</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">container-element</span>&gt;</span></span><br></pre></td></tr></table></figure>
 
-<h4 id="默认值-1"><a href="#默认值-1" class="headerlink" title="默认值"></a>默认值</h4><figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line"><span class="keyword">let</span> options = &#123;</span><br><span class="line">  <span class="attr">title</span>: <span class="string">&quot;Menu&quot;</span></span><br><span class="line">&#125;;</span><br><span class="line"><span class="keyword">let</span> &#123;width = <span class="number">100</span>, height = <span class="number">200</span>, title&#125; = options;</span><br></pre></td></tr></table></figure>
-
-<h4 id="对象展开"><a href="#对象展开" class="headerlink" title="对象展开"></a>对象展开</h4><p>这里用了<strong>三个点</strong>，相当于把对象摊平</p>
-<figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line"><span class="keyword">let</span> shape = &#123;<span class="attr">width</span>:<span class="number">16</span>, <span class="attr">height</span>:<span class="number">9</span>&#125;</span><br><span class="line"><span class="keyword">let</span> square = &#123;<span class="attr">title</span>:<span class="string">&quot;I&#x27;m square&quot;</span>, ...shape&#125; <span class="comment">// &#123;title: &quot;I&#x27;m square&quot;, width: 16, height: 9&#125;</span></span><br></pre></td></tr></table></figure>
-
-<h2 id="关于函数"><a href="#关于函数" class="headerlink" title="关于函数"></a>关于函数</h2><h3 id="Rest-参数与-Spread-语法"><a href="#Rest-参数与-Spread-语法" class="headerlink" title="Rest 参数与 Spread 语法"></a>Rest 参数与 Spread 语法</h3><ul>
-<li>若 … 出现在函数参数列表的最后，那么它就是 rest 参数，它会把参数列表中剩余的参数收集到一个数组中。</li>
-<li>若 … 出现在函数调用或类似的表达式中，那它就是 spread 语法，它会把一个数组展开为列表。</li>
-</ul>
-<h3 id="智能函数参数"><a href="#智能函数参数" class="headerlink" title="智能函数参数"></a>智能函数参数</h3><p>和解构对象相同</p>
-<figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line"><span class="keyword">let</span> options = &#123;</span><br><span class="line">  <span class="attr">title</span>: <span class="string">&quot;My menu&quot;</span>,</span><br><span class="line">  <span class="attr">items</span>: [<span class="string">&quot;Item1&quot;</span>, <span class="string">&quot;Item2&quot;</span>]</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">showMenu</span>(<span class="params">&#123;</span></span></span><br><span class="line"><span class="params"><span class="function">  title = <span class="string">&quot;Untitled&quot;</span>,</span></span></span><br><span class="line"><span class="params"><span class="function">  width: w = <span class="number">100</span>,  <span class="regexp">//</span> width goes to w</span></span></span><br><span class="line"><span class="params"><span class="function">  height: h = <span class="number">200</span>, <span class="regexp">//</span> height goes to h</span></span></span><br><span class="line"><span class="params"><span class="function">  items: [item1, item2] <span class="regexp">//</span> items first element goes to item1, second to item2</span></span></span><br><span class="line"><span class="params"><span class="function">&#125;</span>) </span>&#123;</span><br><span class="line">  alert( <span class="string">`<span class="subst">$&#123;title&#125;</span> <span class="subst">$&#123;w&#125;</span> <span class="subst">$&#123;h&#125;</span>`</span> ); <span class="comment">// My Menu 100 200</span></span><br><span class="line">  alert( item1 ); <span class="comment">// Item1</span></span><br><span class="line">  alert( item2 ); <span class="comment">// Item2</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">showMenu(options);</span><br></pre></td></tr></table></figure>
+<h4 id="自定义指令"><a href="#自定义指令" class="headerlink" title="自定义指令"></a>自定义指令</h4><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">ng g directive directive-name</span><br></pre></td></tr></table></figure>
 ]]></content>
       <categories>
         <category>前端</category>
-        <category>JavaSript</category>
+        <category>Angular</category>
       </categories>
       <tags>
-        <tag>JavaScript</tag>
+        <tag>Angular</tag>
       </tags>
   </entry>
   <entry>

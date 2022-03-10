@@ -22,23 +22,36 @@
   <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
 
 <script class="next-config" data-name="main" type="application/json">{"hostname":"github.io","root":"/","images":"/images","scheme":"Pisces","darkmode":false,"version":"8.9.0","exturl":false,"sidebar":{"position":"left","display":"always","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
-<meta property="og:type" content="website">
-<meta property="og:title" content="李西西的备忘录">
-<meta property="og:url" content="https://lsy-0xcc@github.io/index.html">
+<meta name="description" content="Angular基本概念 YAGNI You Arn’t Gonna Need It.  dry Don’t Repeat Yourself.  对扩展开放，对修改封闭  高内聚低耦合  最少知识原则   基础概念只能通过脚手架构建         模块是抽象透明的容器 主模块（APP）有且只有一个 备忘 路径既可以以根目录为根，也可以以当前位置为根或以模块为根  元素中的#表示编号，只有angul">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Angular 笔记">
+<meta property="og:url" content="https://lsy-0xcc@github.io/posts/front-end/Angular/index.html">
 <meta property="og:site_name" content="李西西的备忘录">
+<meta property="og:description" content="Angular基本概念 YAGNI You Arn’t Gonna Need It.  dry Don’t Repeat Yourself.  对扩展开放，对修改封闭  高内聚低耦合  最少知识原则   基础概念只能通过脚手架构建         模块是抽象透明的容器 主模块（APP）有且只有一个 备忘 路径既可以以根目录为根，也可以以当前位置为根或以模块为根  元素中的#表示编号，只有angul">
 <meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://lsy-0xcc@github.io/posts/front-end/Angular/2022-03-06-21-07-01-image.png">
+<meta property="og:image" content="https://lsy-0xcc@github.io/posts/front-end/Angular/2022-03-06-21-14-15-image.png">
+<meta property="og:image" content="https://lsy-0xcc@github.io/posts/front-end/Angular/2022-03-06-21-07-28-image.png">
+<meta property="og:image" content="https://lsy-0xcc@github.io/posts/front-end/Angular/2022-03-06-21-05-48-image.png">
+<meta property="og:image" content="https://lsy-0xcc@github.io/posts/front-end/Angular/2022-03-06-21-13-36-image.png">
+<meta property="og:image" content="https://lsy-0xcc@github.io/posts/front-end/Angular/2022-03-08-21-18-37-image.png">
+<meta property="og:image" content="https://lsy-0xcc@github.io/posts/front-end/Angular/2022-03-07-23-11-52-image.png">
+<meta property="article:published_time" content="2021-11-27T15:36:03.000Z">
+<meta property="article:modified_time" content="2022-03-10T13:36:10.112Z">
 <meta property="article:author" content="李西西">
+<meta property="article:tag" content="Angular">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://lsy-0xcc@github.io/posts/front-end/Angular/2022-03-06-21-07-01-image.png">
 
 
-<link rel="canonical" href="https://lsy-0xcc@github.io/">
+<link rel="canonical" href="https://lsy-0xcc@github.io/posts/front-end/Angular/">
 
 
 
-<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":true,"isPost":false,"lang":"zh-CN","comments":"","permalink":"","path":"index.html","title":""}</script>
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://lsy-0xcc@github.io/posts/front-end/Angular/","path":"posts/front-end/Angular/","title":"Angular 笔记"}</script>
 
 <script class="next-config" data-name="calendar" type="application/json">""</script>
-<title>李西西的备忘录</title>
+<title>Angular 笔记 | 李西西的备忘录</title>
   
 
 
@@ -67,7 +80,7 @@
 
     <a href="/" class="brand" rel="start">
       <i class="logo-line"></i>
-      <h1 class="site-title">李西西的备忘录</h1>
+      <p class="site-title">李西西的备忘录</p>
       <i class="logo-line"></i>
     </a>
   </div>
@@ -131,7 +144,7 @@
 
   <aside class="sidebar">
 
-    <div class="sidebar-inner sidebar-overview-active">
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
       <ul class="sidebar-nav">
         <li class="sidebar-nav-toc">
           文章目录
@@ -144,6 +157,7 @@
       <div class="sidebar-panel-container">
         <!--noindex-->
         <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Angular"><span class="nav-text">Angular</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5"><span class="nav-text">基本概念</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5"><span class="nav-text">基础概念</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A4%87%E5%BF%98"><span class="nav-text">备忘</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BB%84%E4%BB%B6"><span class="nav-text">组件</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%9B%E5%BB%BA"><span class="nav-text">创建</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9F%BA%E6%9C%AC%E7%8A%B6%E6%80%81"><span class="nav-text">基本状态</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BB%91%E5%AE%9A"><span class="nav-text">绑定</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%BD%92%E7%BA%B3"><span class="nav-text">归纳</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%BB%91%E5%AE%9AHTML"><span class="nav-text">绑定HTML</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%BB%91%E5%AE%9A%E6%95%B0%E6%8D%AE"><span class="nav-text">绑定数据</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%BB%91%E5%AE%9A%E4%BA%8B%E4%BB%B6"><span class="nav-text">绑定事件</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%BB%91%E5%AE%9A%E6%A0%B7%E5%BC%8F-style"><span class="nav-text">绑定样式 style</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%BB%91%E5%AE%9A%E7%B1%BB-class"><span class="nav-text">绑定类 class</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%8F%8C%E5%90%91%E7%BB%91%E5%AE%9A"><span class="nav-text">双向绑定</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%8C%87%E4%BB%A4"><span class="nav-text">指令</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%BD%92%E7%BA%B3-1"><span class="nav-text">归纳</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%BE%AA%E7%8E%AF-ngFor"><span class="nav-text">循环 ngFor</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9D%A1%E4%BB%B6-ngIf"><span class="nav-text">条件 ngIf</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ngSwitch"><span class="nav-text">ngSwitch</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%87%AA%E5%AE%9A%E4%B9%89%E6%8C%87%E4%BB%A4"><span class="nav-text">自定义指令</span></a></li></ol></li></ol></li></ol></li></ol></div>
         </div>
         <!--/noindex-->
 
@@ -208,301 +222,17 @@
 </noscript>
 
 
-    <div class="main-inner index posts-expand">
+    <div class="main-inner post posts-expand">
 
-    
+
+  
 
 
 <div class="post-block">
   
   
 
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://lsy-0xcc@github.io/posts/front-end/JavaScript-spread/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.jpg">
-      <meta itemprop="name" content="李西西">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="李西西的备忘录">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/posts/front-end/JavaScript-spread/" class="post-title-link" itemprop="url">JavaScript 扩展运算符(...) 解构赋值 函数调用</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2022-01-24 08:21:23" itemprop="dateCreated datePublished" datetime="2022-01-24T08:21:23+08:00">2022-01-24</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar-check"></i>
-      </span>
-      <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2022-02-26 22:02:14" itemprop="dateModified" datetime="2022-02-26T22:02:14+08:00">2022-02-26</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/%E5%89%8D%E7%AB%AF/" itemprop="url" rel="index"><span itemprop="name">前端</span></a>
-        </span>
-          ，
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/%E5%89%8D%E7%AB%AF/JavaSript/" itemprop="url" rel="index"><span itemprop="name">JavaSript</span></a>
-        </span>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <h2 id="长求总"><a href="#长求总" class="headerlink" title="长求总"></a>长求总</h2><ul>
-<li>解构赋值</li>
-<li>函数的 rest 参数和 spread 语法</li>
-<li>适用于对象和数组</li>
-<li>用来折腾复杂的对象或者数组，或者用来定义参数特别多特别乱的函数</li>
-</ul>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/posts/front-end/JavaScript-spread/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://lsy-0xcc@github.io/posts/front-end/JavaScript/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.jpg">
-      <meta itemprop="name" content="李西西">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="李西西的备忘录">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/posts/front-end/JavaScript/" class="post-title-link" itemprop="url">JavaScript 笔记</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2022-01-24 08:14:17" itemprop="dateCreated datePublished" datetime="2022-01-24T08:14:17+08:00">2022-01-24</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar-check"></i>
-      </span>
-      <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2022-02-26 22:02:14" itemprop="dateModified" datetime="2022-02-26T22:02:14+08:00">2022-02-26</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/%E5%89%8D%E7%AB%AF/" itemprop="url" rel="index"><span itemprop="name">前端</span></a>
-        </span>
-          ，
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/%E5%89%8D%E7%AB%AF/JavaSript/" itemprop="url" rel="index"><span itemprop="name">JavaSript</span></a>
-        </span>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <p>教程来自</p>
-<ul>
-<li><a target="_blank" rel="noopener" href="https://zh.javascript.info/">现代 JavaScript 教程</a></li>
-</ul>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/posts/front-end/JavaScript/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://lsy-0xcc@github.io/posts/front-end/TypeScript/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.jpg">
-      <meta itemprop="name" content="李西西">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="李西西的备忘录">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/posts/front-end/TypeScript/" class="post-title-link" itemprop="url">TypeScript 笔记</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2022-01-19 17:19:00" itemprop="dateCreated datePublished" datetime="2022-01-19T17:19:00+08:00">2022-01-19</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar-check"></i>
-      </span>
-      <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2022-02-26 22:02:14" itemprop="dateModified" datetime="2022-02-26T22:02:14+08:00">2022-02-26</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/%E5%89%8D%E7%AB%AF/" itemprop="url" rel="index"><span itemprop="name">前端</span></a>
-        </span>
-          ，
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/%E5%89%8D%E7%AB%AF/TypeScript/" itemprop="url" rel="index"><span itemprop="name">TypeScript</span></a>
-        </span>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <p>教程来自</p>
-<ul>
-<li><a target="_blank" rel="noopener" href="https://typescript.bootcss.com/">TypeScript 中文手册</a></li>
-<li><a target="_blank" rel="noopener" href="https://zhongsp.gitbooks.io/typescript-handbook/content/">TypeScript Handbook（中文版）</a></li>
-<li><a target="_blank" rel="noopener" href="https://ts.xcatliu.com/">TypeScript 入门教程</a>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/posts/front-end/TypeScript/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="https://lsy-0xcc@github.io/posts/front-end/Angular/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -515,9 +245,9 @@
       <meta itemprop="name" content="李西西的备忘录">
     </span>
       <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/posts/front-end/Angular/" class="post-title-link" itemprop="url">Angular 笔记</a>
-        </h2>
+        <h1 class="post-title" itemprop="name headline">
+          Angular 笔记
+        </h1>
 
         <div class="post-meta-container">
           <div class="post-meta">
@@ -560,7 +290,7 @@
     
     
     <div class="post-body" itemprop="articleBody">
-          <h1 id="Angular"><a href="#Angular" class="headerlink" title="Angular"></a>Angular</h1><h2 id="基本概念"><a href="#基本概念" class="headerlink" title="基本概念"></a>基本概念</h2><ol>
+        <h1 id="Angular"><a href="#Angular" class="headerlink" title="Angular"></a>Angular</h1><h2 id="基本概念"><a href="#基本概念" class="headerlink" title="基本概念"></a>基本概念</h2><ol>
 <li><p>YAGNI You Arn’t Gonna Need It.</p>
 </li>
 <li><p>dry Don’t Repeat Yourself.</p>
@@ -663,7 +393,6 @@
 
 <h4 id="自定义指令"><a href="#自定义指令" class="headerlink" title="自定义指令"></a>自定义指令</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ng g directive directive-name</span><br></pre></td></tr></table></figure>
 
-      
     </div>
 
     
@@ -671,187 +400,28 @@
     
 
     <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
+          <div class="post-tags">
+              <a href="/tags/Angular/" rel="tag"><i class="fa fa-tag"></i> Angular</a>
+          </div>
 
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://lsy-0xcc@github.io/posts/devops/git-ignore-line/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.jpg">
-      <meta itemprop="name" content="李西西">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="李西西的备忘录">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/posts/devops/git-ignore-line/" class="post-title-link" itemprop="url">Git 单独忽略某一行</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2020-10-22 23:31:42" itemprop="dateCreated datePublished" datetime="2020-10-22T23:31:42+08:00">2020-10-22</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/DevOps/" itemprop="url" rel="index"><span itemprop="name">DevOps</span></a>
-        </span>
-          ，
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/DevOps/Git/" itemprop="url" rel="index"><span itemprop="name">Git</span></a>
-        </span>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <p>Git 提交时又是会有文件中包含敏感信息，比如密码，或者用于测试的配置不想提交。而yaml文件不支持导入另一个yaml文件，若全部忽略跟着很麻烦。</p>
-<p>这是一个不提交某行或者不提交代码块的方法。</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/posts/devops/git-ignore-line/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
         
-      
-    </div>
 
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://lsy-0xcc@github.io/posts/others/hexo/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.jpg">
-      <meta itemprop="name" content="李西西">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="李西西的备忘录">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/posts/others/hexo/" class="post-title-link" itemprop="url">折腾 Hexo</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2020-10-18 17:55:33" itemprop="dateCreated datePublished" datetime="2020-10-18T17:55:33+08:00">2020-10-18</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar-check"></i>
-      </span>
-      <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2022-02-26 22:05:39" itemprop="dateModified" datetime="2022-02-26T22:05:39+08:00">2022-02-26</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/%E5%85%B6%E4%BB%96/" itemprop="url" rel="index"><span itemprop="name">其他</span></a>
-        </span>
-          ，
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/%E5%85%B6%E4%BB%96/Hexo/" itemprop="url" rel="index"><span itemprop="name">Hexo</span></a>
-        </span>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <p>记一下避免<span class="emoji" alias="chipmunk" style="" fallback-src="https://github.githubassets.com/images/icons/emoji/unicode/1f43f.png?v8">&#x1f43f;</span>行为</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/posts/others/hexo/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/posts/devops/git-ignore-line/" rel="prev" title="Git 单独忽略某一行">
+                  <i class="fa fa-chevron-left"></i> Git 单独忽略某一行
+                </a>
             </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
+            <div class="post-nav-item">
+                <a href="/posts/front-end/TypeScript/" rel="next" title="TypeScript 笔记">
+                  TypeScript 笔记 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
     </footer>
   </article>
 </div>
+
 
 
 
