@@ -30,9 +30,7 @@ categories:
 
 框架
 
-1. ![**组件是与用户交互的对象，所有操作都应该与用户操作有关，与用户操作无关的应该放在服务里，剥离在外为组件服务]()**
-
-
+1. **组件是与用户交互的对象，所有操作都应该与用户操作有关，与用户操作无关的应该放在服务里，剥离在外为组件服务**
 
 ## 基础概念
 
@@ -50,6 +48,8 @@ categories:
 
 主模块（APP）有且只有一个
 
+项目结构：[Angular - 风格指南](https://angular.cn/guide/styleguide#overall-structural-guidelines) [如何更好地组织angular项目 - 掘金](https://juejin.cn/post/6844903829436104717) [如何更好地组织Angular项目 | tc9011's](https://tc9011.com/2019/04/24/%E5%A6%82%E4%BD%95%E6%9B%B4%E5%A5%BD%E5%9C%B0%E7%BB%84%E7%BB%87angular%E9%A1%B9%E7%9B%AE/)
+
 ## 备忘
 
 - 路径既可以以根目录为根，也可以以当前位置为根或以模块为根
@@ -60,7 +60,7 @@ categories:
 
 - ng-template 与 ng-container 的区别：template 里面得有结构化指令或者 tenplate 编号，没有不渲染，ng-cotainer 就是透明的
 
-## 组件
+## 组件 component
 
 ![](Angular/2022-03-06-21-13-36-image.png)
 
@@ -180,9 +180,9 @@ ngStyle  不再提供显著价值，将来可能会被删除。(等于多重样
 />
 ```
 
-### 指令
+## 指令 directive
 
-#### 归纳
+### 归纳
 
 指令
 
@@ -192,7 +192,7 @@ ngStyle  不再提供显著价值，将来可能会被删除。(等于多重样
 
 3. 属性型指令：不会改变 DOM 树结构，只改变元素外观，用[]扩上
 
-#### 循环 ngFor
+### 循环 ngFor
 
 ```html
 <li *ngFor="let item of items; index as i; trackBy: trackByFn">...</li>
@@ -209,7 +209,7 @@ ngStyle  不再提供显著价值，将来可能会被删除。(等于多重样
 
 trackByFn 用来获取 index
 
-#### 条件 ngIf
+### 条件 ngIf
 
 ```html
 <div *ngIf="condition">Content to render when condition is true.</div>
@@ -234,7 +234,7 @@ trackByFn 用来获取 index
 
 \*ngIF 可以跟函数 then else 只能是 template
 
-#### ngSwitch
+### ngSwitch
 
 ```html
 <container-element [ngSwitch]="switch_expression">
@@ -249,7 +249,7 @@ trackByFn 用来获取 index
 </container-element>
 ```
 
-#### 自定义指令
+### 自定义指令
 
 ```shell
 ng g directive directive-name
@@ -271,9 +271,9 @@ export class MyStressDirectiveDirective {
 }
 ```
 
-改变了一个元素的style
+改变了一个元素的style，背景变为黄色。
 
-## 管道
+## 管道 pipe
 
 Filter：过滤器 → Pipe：管道
 
@@ -330,13 +330,13 @@ args 是其他参数
 
 其他参考 [Angular - API 列表](https://angular.cn/api?type=pipe)
 
-## 依赖注入
+## 依赖注入 DI
 
 **组件是与用户交互的对象，所有操作都应该与用户操作有关，与用户操作无关的应该放在服务里，剥离在外为组件服务**
 
 ![](Angular/2022-03-11-22-26-34-image.png)
 
-
+## 服务 service
 
 组件不自己 new service 通过声明依赖来创建
 
@@ -347,6 +347,7 @@ ng g service service-name
 生成模板
 
 ```typescript
+// service.ts 声明服务的文件
 import { Injectable } from '@angular/core';
 
 @Injectable({
@@ -363,6 +364,7 @@ export class MyServiceService {
 component 使用 service
 
 ```ts
+// component.ts
 import { MyServiceService } from '../my-service.service';
 
 @Component({
@@ -382,3 +384,55 @@ export class MyDirectiveComponent implements OnInit {
 ```
 
 ### HttpClient
+
+```ts
+// module.ts
+import { HttpClientModule } from '@angular/common/http'
+
+@NgModule({
+  imports: [HttpClientModule],
+})
+export class LearningAngularModule {}
+```
+
+返回一个 rxjs 的 Observable 类型，使用 subscribe 获得返回信息
+
+```ts
+// service.ts
+import { HttpClient } from '@angular/common/http';
+import { Injectable } from '@angular/core';
+import { Observable } from 'rxjs';
+import { Currency } from './currency.model' // 数据定义接口
+
+@Injectable({
+  providedIn: 'root',
+})
+export class HttpNetworkService {
+  httpClient: HttpClient;
+  constructor(httpClient: HttpClient) {
+    this.httpClient = httpClient;
+  }
+
+  getData(): Observable<Currency[]> {
+    let url = 'https://api.blockchain.com/v3/exchange/tickers';
+    return <Observable<Currency[]>> this.httpClient.get(url);
+  }
+}
+
+```
+
+![](Angular/2022-03-13-00-04-20-image.png)
+
+jquery 已经支持 promise 了，然而好像并没有什么卵用。
+
+#### 发布订阅模式
+
+Observable:可被关注的对象,在未来某个不确定的时间点可能抛出特定的事件
+
+Subscribe:订阅,建立与可被关注的对象的契约,一旦得到新消息立即会被通知
+
+## 模块 Module
+
+### 备忘
+
+想要其他模块使用组件需要export
