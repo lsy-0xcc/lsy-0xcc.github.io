@@ -1,70 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
-    <title>Git 单独忽略某一行</title>
-    <url>/posts/devops/git-ignore-line/</url>
-    <content><![CDATA[<p>Git 提交时又是会有文件中包含敏感信息，比如密码，或者用于测试的配置不想提交。而yaml文件不支持导入另一个yaml文件，若全部忽略跟着很麻烦。</p>
-<p>这是一个不提交某行或者不提交代码块的方法。</p>
-<span id="more"></span>
-
-<h2 id="步骤"><a href="#步骤" class="headerlink" title="步骤"></a>步骤</h2><ol>
-<li><p>添加在根目录下添加 <code>.gitattributes</code> 文件</p>
-<figure class="highlight properties"><table><tr><td class="code"><pre><span class="line"><span class="meta">*.yml</span> <span class="string">filter=HashIgnore</span></span><br></pre></td></tr></table></figure>
-
-<p><code>*.yml</code> 为正则表达式，表示所有扩展名为 <code>yml</code> 的文件。可以自己修改。</p>
-<p>这一行表示为所有 <code>yml</code> 文件添filter <code>HashIgnore</code>。</p>
-</li>
-<li><p>配置 filter</p>
-<p>有以下两种方式</p>
-<p>放心大胆地改，写错了可以用 <code>git config --global --edit</code>  或者 <code>git config --global --unset</code> 恢复。</p>
-<ul>
-<li><p>使用命令行</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">git config --global filter.hashignore.clean <span class="string">&quot;sed &#x27;/# *NoCommit$/d&#x27; %f| sed &#x27;/# *BeginNoCommit/,/# *EndNoCommit/d&#x27;&quot;</span></span><br><span class="line">git config --global filter.hashignore.smudge <span class="string">&quot;cat&quot;</span></span><br></pre></td></tr></table></figure></li>
-<li><p>编辑文本</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">git config --global --edit</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight properties"><table><tr><td class="code"><pre><span class="line"><span class="meta">[filter</span> <span class="string">&quot;HashIgnore&quot;]</span></span><br><span class="line">	<span class="attr">clean</span> = <span class="string">&quot;sed &#x27;/# *NoCommit$/d&#x27; %f| sed &#x27;/# *BeginNoCommit/,/# *EndNoCommit/d&#x27;&quot;</span></span><br><span class="line">	<span class="attr">smudge</span> = <span class="string">&quot;cat&quot;</span></span><br></pre></td></tr></table></figure></li>
-</ul>
-</li>
-</ol>
-<h2 id="原理"><a href="#原理" class="headerlink" title="原理"></a>原理</h2><h3 id="gitattributes"><a href="#gitattributes" class="headerlink" title=".gitattributes"></a>.gitattributes</h3><p>.gitattributes文件可以让Git对指定位置的文件或应用一定的规则。这里定义一个filter。</p>
-<p>filter的clean属性表示在执行 <code>git add</code> 时执行的脚本，这里设置忽略某行或某个代码块。</p>
-<p>filter的smudge属性表示在执行 <code>git add</code> 时执行的脚本，<code>cat</code> 表示什么也不做。</p>
-<h4 id="f"><a href="#f" class="headerlink" title="%f"></a>%f</h4><p><strong>脚本中的 <code>%f</code> 表示脚本中需要处理的文件</strong></p>
-<h3 id="sed-命令"><a href="#sed-命令" class="headerlink" title="sed 命令"></a>sed 命令</h3><p>sed 是 Linux 中的流编辑器，用于处理文件</p>
-<p>参考文档<a href="https://www.gnu.org/software/sed/">GNU sed - GNU Project - Free Software Foundation</a></p>
-<p>执行脚本的意义</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">sed <span class="string">&#x27;/# *NoCommit$/d&#x27;</span> %f</span><br></pre></td></tr></table></figure>
-
-<p>表示删除 <code>%f</code> 中匹配 <code># *NoCommit$</code> 正则表达式的行</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">sed <span class="string">&#x27;/# *BeginNoCommit/,/# *EndNoCommit/d&#x27;</span></span><br></pre></td></tr></table></figure>
-
-<p>表示删除匹配 <code># *BeginNoCommit</code> 正则表达式和匹配 <code># *EndNoCommit$</code> 正则表达式之间的所有行</p>
-<h4 id="特殊转义"><a href="#特殊转义" class="headerlink" title="特殊转义"></a>特殊转义</h4><p>由于sed中正则表达式前后要使用 <code>/</code> 符号，所以也需要转义为 <code> \/</code> 。</p>
-<p>如果以后需要在 Java 文件这种使用 <code>//</code> 作为注释的需要注意</p>
-<h3 id="“-”-管道"><a href="#“-”-管道" class="headerlink" title="“|”  管道"></a>“|”  管道</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">command1 | command2</span><br><span class="line">command1 | command2 [ | commandN... ]</span><br></pre></td></tr></table></figure>
-
-<p>当在两个命令之间设置管道时，管道符<code>|</code>左边命令的输出就变成了右边命令的输入。只要第一个命令向标准输出写入，而第二个命令是从标准输入读取，那么这两个命令就可以形成一个管道。大部分的 Linux 命令都可以用来形成管道。</p>
-<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://stackoverflow.com/questions/6557467/can-git-ignore-a-specific-line/22171275#22171275">gitx - Can git ignore a specific line? - Stack Overflow</a></p>
-<p><a href="https://git-scm.com/docs/gitattributes">https://git-scm.com/docs/gitattributes</a></p>
-<p><a href="https://www.gnu.org/software/sed/">GNU sed - GNU Project - Free Software Foundation</a></p>
-<p><a href="http://c.biancheng.net/view/3131.html">Linux Shell管道详解</a></p>
-]]></content>
-      <categories>
-        <category>DevOps</category>
-        <category>Git</category>
-      </categories>
-      <tags>
-        <tag>Git</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>Angular 笔记</title>
     <url>/posts/front-end/Angular/</url>
     <content><![CDATA[<p>教程来自</p>
 <ul>
 <li><a href="https://angular.cn/">Angular</a></li>
 <li><a href="https://www.bilibili.com/video/BV1R54y1J75g?p=27">Angular 全套实战教程，零基础入门前端框架_哔哩哔哩_bilibili</a></li>
+</ul>
+<p>还差</p>
+<ul>
+<li><p>ng 识别符</p>
+</li>
+<li><p>路由</p>
+</li>
+<li><p>无限滚动</p>
+</li>
+<li><p>ngModel</p>
+</li>
+<li><p>* 和 []</p>
+</li>
 </ul>
 <span id="more"></span>
 
@@ -107,9 +62,11 @@
 <li><p>ng-template 与 ng-container 的区别：template 里面得有结构化指令或者 tenplate 编号，没有不渲染，ng-cotainer 就是透明的</p>
 </li>
 </ul>
-<h2 id="组件-component"><a href="#组件-component" class="headerlink" title="组件 component"></a>组件 component</h2><img src="/posts/front-end/Angular/2022-03-06-21-13-36-image.png" class="">
+<h2 id="组件-component"><a href="#组件-component" class="headerlink" title="组件 component"></a>组件 component</h2><h3 id="备忘-1"><a href="#备忘-1" class="headerlink" title="备忘"></a>备忘</h3><img src="/posts/front-end/Angular/2022-03-13-23-26-17-image.png" class="">
 
-<h3 id="创建"><a href="#创建" class="headerlink" title="创建"></a>创建</h3><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">ng g component component-name</span><br></pre></td></tr></table></figure>
+<h3 id="创建"><a href="#创建" class="headerlink" title="创建"></a>创建</h3><img src="/posts/front-end/Angular/2022-03-06-21-13-36-image.png" class="">
+
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">ng g component component-name</span><br></pre></td></tr></table></figure>
 
 <p>横线分割单词</p>
 <p>在哪个 module 的文件夹下就创建在哪个 module 里，不在任何 module 下就在默认</p>
@@ -149,7 +106,7 @@
 </li>
 </ul>
 <p><strong>对于任何类似对象的表达式（例如  <code>object</code>、<code>Array</code>、<code>Map</code>  或  <code>Set</code>，必须更改对象的引用，Angular 才能更新类列表。在不更改对象引用的情况下只更新其 Attribute 是不会生效的。</strong><img src="/posts/front-end/Angular/2022-03-07-23-11-52-image.png" class=""></p>
-<h4 id="双向绑定"><a href="#双向绑定" class="headerlink" title="双向绑定"></a>双向绑定</h4><ol>
+<h4 id="双向绑定-ngModel"><a href="#双向绑定-ngModel" class="headerlink" title="双向绑定 ngModel"></a>双向绑定 ngModel</h4><ol>
 <li><strong>导入  <code>[FormsModule]</code>，并将其添加到 NgModule 的  <code>imports</code>  列表中。</strong></li>
 <li>在 HTML 的  <code>&lt;form&gt;</code>  元素上添加  <code>[(ngModel)]</code>  绑定，并将其设置为等于此属性</li>
 </ol>
@@ -157,6 +114,15 @@
 
 <p>可以自定义事件</p>
 <figure class="highlight html"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">input</span></span></span><br><span class="line"><span class="tag">  [<span class="attr">ngModel</span>]=<span class="string">&quot;currentItem.name&quot;</span></span></span><br><span class="line"><span class="tag">  (<span class="attr">ngModelChange</span>)=<span class="string">&quot;setUppercaseName($event)&quot;</span></span></span><br><span class="line"><span class="tag">/&gt;</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="父子组件传值"><a href="#父子组件传值" class="headerlink" title="父子组件传值"></a>父子组件传值</h3><p>父传子 prop 子传父 event props down event up</p>
+<h4 id="父传子"><a href="#父传子" class="headerlink" title="父传子"></a>父传子</h4><p>输入型属性</p>
+<img src="/posts/front-end/Angular/2022-03-13-22-48-06-image.png" class="">
+
+<p>Input 在 angular core 里面</p>
+<h4 id="子传父"><a href="#子传父" class="headerlink" title="子传父"></a>子传父</h4><p>$emit</p>
+<p>子组件通过触发特定的事件(其中携帯着数据),把数据传递给父组件(父组件提供事件处理方法)</p>
+<img src="/posts/front-end/Angular/2022-03-13-23-24-42-image.png" class="">
 
 <h2 id="指令-directive"><a href="#指令-directive" class="headerlink" title="指令 directive"></a>指令 directive</h2><h3 id="归纳-1"><a href="#归纳-1" class="headerlink" title="归纳"></a>归纳</h3><p>指令</p>
 <ol>
@@ -211,14 +177,14 @@
 <h3 id="HttpClient"><a href="#HttpClient" class="headerlink" title="HttpClient"></a>HttpClient</h3><figure class="highlight ts"><table><tr><td class="code"><pre><span class="line"><span class="comment">// module.ts</span></span><br><span class="line"><span class="keyword">import</span> &#123; HttpClientModule &#125; <span class="keyword">from</span> <span class="string">&#x27;@angular/common/http&#x27;</span></span><br><span class="line"></span><br><span class="line"><span class="meta">@NgModule</span>(&#123;</span><br><span class="line">  <span class="attr">imports</span>: [HttpClientModule],</span><br><span class="line">&#125;)</span><br><span class="line"><span class="keyword">export</span> <span class="class"><span class="keyword">class</span> <span class="title">LearningAngularModule</span> </span>&#123;&#125;</span><br></pre></td></tr></table></figure>
 
 <p>返回一个 rxjs 的 Observable 类型，使用 subscribe 获得返回信息</p>
-<figure class="highlight ts"><table><tr><td class="code"><pre><span class="line"><span class="comment">// service.ts</span></span><br><span class="line"><span class="keyword">import</span> &#123; HttpClient &#125; <span class="keyword">from</span> <span class="string">&#x27;@angular/common/http&#x27;</span>;</span><br><span class="line"><span class="keyword">import</span> &#123; Injectable &#125; <span class="keyword">from</span> <span class="string">&#x27;@angular/core&#x27;</span>;</span><br><span class="line"><span class="keyword">import</span> &#123; Observable &#125; <span class="keyword">from</span> <span class="string">&#x27;rxjs&#x27;</span>;</span><br><span class="line"><span class="keyword">import</span> &#123; Currency &#125; <span class="keyword">from</span> <span class="string">&#x27;./currency.model&#x27;</span> <span class="comment">// 数据定义接口</span></span><br><span class="line"></span><br><span class="line"><span class="meta">@Injectable</span>(&#123;</span><br><span class="line">  <span class="attr">providedIn</span>: <span class="string">&#x27;root&#x27;</span>,</span><br><span class="line">&#125;)</span><br><span class="line"><span class="keyword">export</span> <span class="class"><span class="keyword">class</span> <span class="title">HttpNetworkService</span> </span>&#123;</span><br><span class="line">  <span class="attr">httpClient</span>: HttpClient;</span><br><span class="line">  <span class="function"><span class="title">constructor</span>(<span class="params">httpClient: HttpClient</span>)</span> &#123;</span><br><span class="line">    <span class="built_in">this</span>.httpClient = httpClient;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  getData(): Observable&lt;Currency[]&gt; &#123;</span><br><span class="line">    <span class="keyword">let</span> url = <span class="string">&#x27;https://api.blockchain.com/v3/exchange/tickers&#x27;</span>;</span><br><span class="line">    <span class="keyword">return</span> &lt;Observable&lt;Currency[]&gt;&gt; <span class="built_in">this</span>.httpClient.get(url);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<figure class="highlight ts"><table><tr><td class="code"><pre><span class="line"><span class="comment">// service.ts</span></span><br><span class="line"><span class="keyword">import</span> &#123; HttpClient &#125; <span class="keyword">from</span> <span class="string">&#x27;@angular/common/http&#x27;</span>;</span><br><span class="line"><span class="keyword">import</span> &#123; Injectable &#125; <span class="keyword">from</span> <span class="string">&#x27;@angular/core&#x27;</span>;</span><br><span class="line"><span class="keyword">import</span> &#123; Observable &#125; <span class="keyword">from</span> <span class="string">&#x27;rxjs&#x27;</span>;</span><br><span class="line"><span class="keyword">import</span> &#123; Currency &#125; <span class="keyword">from</span> <span class="string">&#x27;./currency.model&#x27;</span> <span class="comment">// 数据定义接口</span></span><br><span class="line"></span><br><span class="line"><span class="meta">@Injectable</span>(&#123;</span><br><span class="line">  <span class="attr">providedIn</span>: <span class="string">&#x27;root&#x27;</span>,</span><br><span class="line">&#125;)</span><br><span class="line"><span class="keyword">export</span> <span class="class"><span class="keyword">class</span> <span class="title">HttpNetworkService</span> </span>&#123;</span><br><span class="line">  <span class="attr">httpClient</span>: HttpClient;</span><br><span class="line">  <span class="function"><span class="title">constructor</span>(<span class="params">httpClient: HttpClient</span>)</span> &#123;</span><br><span class="line">    <span class="built_in">this</span>.httpClient = httpClient;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  getData(): Observable&lt;Currency[]&gt; &#123;</span><br><span class="line">    <span class="keyword">let</span> url = <span class="string">&#x27;https://api.blockchain.com/v3/exchange/tickers&#x27;</span>;</span><br><span class="line">    <span class="keyword">return</span> &lt;Observable&lt;Currency[]&gt;&gt; <span class="built_in">this</span>.httpClient.get(url);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <img src="/posts/front-end/Angular/2022-03-13-00-04-20-image.png" class="">
 
 <p>jquery 已经支持 promise 了，然而好像并没有什么卵用。</p>
 <h4 id="发布订阅模式"><a href="#发布订阅模式" class="headerlink" title="发布订阅模式"></a>发布订阅模式</h4><p>Observable:可被关注的对象,在未来某个不确定的时间点可能抛出特定的事件</p>
 <p>Subscribe:订阅,建立与可被关注的对象的契约,一旦得到新消息立即会被通知</p>
-<h2 id="模块-Module"><a href="#模块-Module" class="headerlink" title="模块 Module"></a>模块 Module</h2><h3 id="备忘-1"><a href="#备忘-1" class="headerlink" title="备忘"></a>备忘</h3><p>想要其他模块使用组件需要export</p>
+<h2 id="模块-Module"><a href="#模块-Module" class="headerlink" title="模块 Module"></a>模块 Module</h2><h3 id="备忘-2"><a href="#备忘-2" class="headerlink" title="备忘"></a>备忘</h3><p>想要其他模块使用组件需要export<u></u></p>
 ]]></content>
       <categories>
         <category>前端</category>
@@ -226,52 +192,6 @@
       </categories>
       <tags>
         <tag>Angular</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>JavaScript 笔记</title>
-    <url>/posts/front-end/JavaScript/</url>
-    <content><![CDATA[<p>教程来自</p>
-<ul>
-<li><a href="https://zh.javascript.info/">现代 JavaScript 教程</a></li>
-</ul>
-<span id="more"></span>
-
-<h2 id="基础"><a href="#基础" class="headerlink" title="基础"></a>基础</h2><ol>
-<li>假值 <code>false</code> <code>0</code> <code>NaN</code> <code>undiefined</code> <code>null</code> <code>&quot;&quot;</code></li>
-<li><code>??</code> 空值合并运算符<ul>
-<li><code>a??default</code> 若 <code>a</code> 是 <code>null</code> 或 <code>undefined</code> 返回 <code>default</code> 否则返回 <code>a</code></li>
-</ul>
-</li>
-</ol>
-<h2 id="对象"><a href="#对象" class="headerlink" title="对象"></a>对象</h2><h2 id="数据类型"><a href="#数据类型" class="headerlink" title="数据类型"></a>数据类型</h2><ol>
-<li>原始类型<ol>
-<li>只有 <code>string</code> <code>number</code> <code>bigint</code> <code>boolean</code> <code>symbol</code> <code>null</code> <code>undefined</code></li>
-<li>调用方法会自动包装，<code>null</code> <code>undefined</code> 无属性和方法</li>
-<li>自动包装 <code>String()</code> <code>Number()</code> <code>Boolean()</code> 一般不要用</li>
-</ol>
-</li>
-<li>数字<ol>
-<li>0b 0o 0x …e…</li>
-<li>常用函数<ul>
-<li><code>number.toString(base)</code> 以 base 为进制转换</li>
-<li><code>parseInt(str [,radix])</code> radix是进制</li>
-<li>Math.ceil Math.floor Math.round Math.trunc number.toFixed(n)</li>
-</ul>
-</li>
-</ol>
-</li>
-<li>bigint 整形 n 结尾</li>
-<li>字符串</li>
-<li>数组</li>
-</ol>
-<h2 id="函数"><a href="#函数" class="headerlink" title="函数"></a>函数</h2><h2 id="对象属性配置"><a href="#对象属性配置" class="headerlink" title="对象属性配置"></a>对象属性配置</h2><h2 id="原型继承"><a href="#原型继承" class="headerlink" title="原型继承"></a>原型继承</h2><h2 id="类"><a href="#类" class="headerlink" title="类"></a>类</h2>]]></content>
-      <categories>
-        <category>前端</category>
-        <category>JavaSript</category>
-      </categories>
-      <tags>
-        <tag>JavaScript</tag>
       </tags>
   </entry>
   <entry>
@@ -325,6 +245,52 @@
 <h3 id="智能函数参数"><a href="#智能函数参数" class="headerlink" title="智能函数参数"></a>智能函数参数</h3><p>和解构对象相同</p>
 <figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line"><span class="keyword">let</span> options = &#123;</span><br><span class="line">  <span class="attr">title</span>: <span class="string">&quot;My menu&quot;</span>,</span><br><span class="line">  <span class="attr">items</span>: [<span class="string">&quot;Item1&quot;</span>, <span class="string">&quot;Item2&quot;</span>]</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">showMenu</span>(<span class="params">&#123;</span></span></span><br><span class="line"><span class="params"><span class="function">  title = <span class="string">&quot;Untitled&quot;</span>,</span></span></span><br><span class="line"><span class="params"><span class="function">  width: w = <span class="number">100</span>,  <span class="regexp">//</span> width goes to w</span></span></span><br><span class="line"><span class="params"><span class="function">  height: h = <span class="number">200</span>, <span class="regexp">//</span> height goes to h</span></span></span><br><span class="line"><span class="params"><span class="function">  items: [item1, item2] <span class="regexp">//</span> items first element goes to item1, second to item2</span></span></span><br><span class="line"><span class="params"><span class="function">&#125;</span>) </span>&#123;</span><br><span class="line">  alert( <span class="string">`<span class="subst">$&#123;title&#125;</span> <span class="subst">$&#123;w&#125;</span> <span class="subst">$&#123;h&#125;</span>`</span> ); <span class="comment">// My Menu 100 200</span></span><br><span class="line">  alert( item1 ); <span class="comment">// Item1</span></span><br><span class="line">  alert( item2 ); <span class="comment">// Item2</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">showMenu(options);</span><br></pre></td></tr></table></figure>
 ]]></content>
+      <categories>
+        <category>前端</category>
+        <category>JavaSript</category>
+      </categories>
+      <tags>
+        <tag>JavaScript</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>JavaScript 笔记</title>
+    <url>/posts/front-end/JavaScript/</url>
+    <content><![CDATA[<p>教程来自</p>
+<ul>
+<li><a href="https://zh.javascript.info/">现代 JavaScript 教程</a></li>
+</ul>
+<span id="more"></span>
+
+<h2 id="基础"><a href="#基础" class="headerlink" title="基础"></a>基础</h2><ol>
+<li>假值 <code>false</code> <code>0</code> <code>NaN</code> <code>undiefined</code> <code>null</code> <code>&quot;&quot;</code></li>
+<li><code>??</code> 空值合并运算符<ul>
+<li><code>a??default</code> 若 <code>a</code> 是 <code>null</code> 或 <code>undefined</code> 返回 <code>default</code> 否则返回 <code>a</code></li>
+</ul>
+</li>
+</ol>
+<h2 id="对象"><a href="#对象" class="headerlink" title="对象"></a>对象</h2><h2 id="数据类型"><a href="#数据类型" class="headerlink" title="数据类型"></a>数据类型</h2><ol>
+<li>原始类型<ol>
+<li>只有 <code>string</code> <code>number</code> <code>bigint</code> <code>boolean</code> <code>symbol</code> <code>null</code> <code>undefined</code></li>
+<li>调用方法会自动包装，<code>null</code> <code>undefined</code> 无属性和方法</li>
+<li>自动包装 <code>String()</code> <code>Number()</code> <code>Boolean()</code> 一般不要用</li>
+</ol>
+</li>
+<li>数字<ol>
+<li>0b 0o 0x …e…</li>
+<li>常用函数<ul>
+<li><code>number.toString(base)</code> 以 base 为进制转换</li>
+<li><code>parseInt(str [,radix])</code> radix是进制</li>
+<li>Math.ceil Math.floor Math.round Math.trunc number.toFixed(n)</li>
+</ul>
+</li>
+</ol>
+</li>
+<li>bigint 整形 n 结尾</li>
+<li>字符串</li>
+<li>数组</li>
+</ol>
+<h2 id="函数"><a href="#函数" class="headerlink" title="函数"></a>函数</h2><h2 id="对象属性配置"><a href="#对象属性配置" class="headerlink" title="对象属性配置"></a>对象属性配置</h2><h2 id="原型继承"><a href="#原型继承" class="headerlink" title="原型继承"></a>原型继承</h2><h2 id="类"><a href="#类" class="headerlink" title="类"></a>类</h2>]]></content>
       <categories>
         <category>前端</category>
         <category>JavaSript</category>
@@ -452,6 +418,64 @@
       </categories>
       <tags>
         <tag>TypeScript</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Git 单独忽略某一行</title>
+    <url>/posts/devops/git-ignore-line/</url>
+    <content><![CDATA[<p>Git 提交时又是会有文件中包含敏感信息，比如密码，或者用于测试的配置不想提交。而yaml文件不支持导入另一个yaml文件，若全部忽略跟着很麻烦。</p>
+<p>这是一个不提交某行或者不提交代码块的方法。</p>
+<span id="more"></span>
+
+<h2 id="步骤"><a href="#步骤" class="headerlink" title="步骤"></a>步骤</h2><ol>
+<li><p>添加在根目录下添加 <code>.gitattributes</code> 文件</p>
+<figure class="highlight properties"><table><tr><td class="code"><pre><span class="line"><span class="meta">*.yml</span> <span class="string">filter=HashIgnore</span></span><br></pre></td></tr></table></figure>
+
+<p><code>*.yml</code> 为正则表达式，表示所有扩展名为 <code>yml</code> 的文件。可以自己修改。</p>
+<p>这一行表示为所有 <code>yml</code> 文件添filter <code>HashIgnore</code>。</p>
+</li>
+<li><p>配置 filter</p>
+<p>有以下两种方式</p>
+<p>放心大胆地改，写错了可以用 <code>git config --global --edit</code>  或者 <code>git config --global --unset</code> 恢复。</p>
+<ul>
+<li><p>使用命令行</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">git config --global filter.hashignore.clean <span class="string">&quot;sed &#x27;/# *NoCommit$/d&#x27; %f| sed &#x27;/# *BeginNoCommit/,/# *EndNoCommit/d&#x27;&quot;</span></span><br><span class="line">git config --global filter.hashignore.smudge <span class="string">&quot;cat&quot;</span></span><br></pre></td></tr></table></figure></li>
+<li><p>编辑文本</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">git config --global --edit</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight properties"><table><tr><td class="code"><pre><span class="line"><span class="meta">[filter</span> <span class="string">&quot;HashIgnore&quot;]</span></span><br><span class="line">	<span class="attr">clean</span> = <span class="string">&quot;sed &#x27;/# *NoCommit$/d&#x27; %f| sed &#x27;/# *BeginNoCommit/,/# *EndNoCommit/d&#x27;&quot;</span></span><br><span class="line">	<span class="attr">smudge</span> = <span class="string">&quot;cat&quot;</span></span><br></pre></td></tr></table></figure></li>
+</ul>
+</li>
+</ol>
+<h2 id="原理"><a href="#原理" class="headerlink" title="原理"></a>原理</h2><h3 id="gitattributes"><a href="#gitattributes" class="headerlink" title=".gitattributes"></a>.gitattributes</h3><p>.gitattributes文件可以让Git对指定位置的文件或应用一定的规则。这里定义一个filter。</p>
+<p>filter的clean属性表示在执行 <code>git add</code> 时执行的脚本，这里设置忽略某行或某个代码块。</p>
+<p>filter的smudge属性表示在执行 <code>git add</code> 时执行的脚本，<code>cat</code> 表示什么也不做。</p>
+<h4 id="f"><a href="#f" class="headerlink" title="%f"></a>%f</h4><p><strong>脚本中的 <code>%f</code> 表示脚本中需要处理的文件</strong></p>
+<h3 id="sed-命令"><a href="#sed-命令" class="headerlink" title="sed 命令"></a>sed 命令</h3><p>sed 是 Linux 中的流编辑器，用于处理文件</p>
+<p>参考文档<a href="https://www.gnu.org/software/sed/">GNU sed - GNU Project - Free Software Foundation</a></p>
+<p>执行脚本的意义</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">sed <span class="string">&#x27;/# *NoCommit$/d&#x27;</span> %f</span><br></pre></td></tr></table></figure>
+
+<p>表示删除 <code>%f</code> 中匹配 <code># *NoCommit$</code> 正则表达式的行</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">sed <span class="string">&#x27;/# *BeginNoCommit/,/# *EndNoCommit/d&#x27;</span></span><br></pre></td></tr></table></figure>
+
+<p>表示删除匹配 <code># *BeginNoCommit</code> 正则表达式和匹配 <code># *EndNoCommit$</code> 正则表达式之间的所有行</p>
+<h4 id="特殊转义"><a href="#特殊转义" class="headerlink" title="特殊转义"></a>特殊转义</h4><p>由于sed中正则表达式前后要使用 <code>/</code> 符号，所以也需要转义为 <code> \/</code> 。</p>
+<p>如果以后需要在 Java 文件这种使用 <code>//</code> 作为注释的需要注意</p>
+<h3 id="“-”-管道"><a href="#“-”-管道" class="headerlink" title="“|”  管道"></a>“|”  管道</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">command1 | command2</span><br><span class="line">command1 | command2 [ | commandN... ]</span><br></pre></td></tr></table></figure>
+
+<p>当在两个命令之间设置管道时，管道符<code>|</code>左边命令的输出就变成了右边命令的输入。只要第一个命令向标准输出写入，而第二个命令是从标准输入读取，那么这两个命令就可以形成一个管道。大部分的 Linux 命令都可以用来形成管道。</p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://stackoverflow.com/questions/6557467/can-git-ignore-a-specific-line/22171275#22171275">gitx - Can git ignore a specific line? - Stack Overflow</a></p>
+<p><a href="https://git-scm.com/docs/gitattributes">https://git-scm.com/docs/gitattributes</a></p>
+<p><a href="https://www.gnu.org/software/sed/">GNU sed - GNU Project - Free Software Foundation</a></p>
+<p><a href="http://c.biancheng.net/view/3131.html">Linux Shell管道详解</a></p>
+]]></content>
+      <categories>
+        <category>DevOps</category>
+        <category>Git</category>
+      </categories>
+      <tags>
+        <tag>Git</tag>
       </tags>
   </entry>
   <entry>
