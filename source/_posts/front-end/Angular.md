@@ -14,15 +14,29 @@ categories:
 
 还差
 
-- ng 识别符
+- 表单
 
-- 路由
+- 生命周期
+
+- rxjs
+
+
+
+- ng 识别符
 
 - 无限滚动
 
 - ngModel
 
 - \* 和 []
+
+- 插槽
+
+- 结构型指令
+
+- ref
+
+- onpush
 
 <!--more-->
 
@@ -216,6 +230,7 @@ $emit
 
 ![](Angular/2022-03-13-23-24-42-image.png)
 
+```![](Angular/2022-03-15-22-12-52-image.png)
 ## 指令 directive
 
 ### 归纳
@@ -470,4 +485,48 @@ Subscribe:订阅,建立与可被关注的对象的契约,一旦得到新消息�
 
 ### 备忘
 
-想要其他模块使用组件需要export<u></u>
+想要其他模块使用组件需要export
+
+## 路由
+
+构建路由词典
+
+![](Angular/2022-03-15-22-45-04-image.png)
+
+```shell
+ng g module xx..module
+```
+
+### 子路由
+
+使用 loadchild 懒加载
+
+### 路由守卫
+
+```
+ng g guard xx
+```
+
+
+
+## TS相关
+
+默认的访问控制是public
+
+```ts
+class Info {
+    public name: string
+    private age: number
+    constructor() {
+        // ...
+    }
+}
+
+// ============>
+
+class Info {
+    constructor(
+        public name: string
+        private age: number ) {}
+}
+```

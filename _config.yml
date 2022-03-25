@@ -110,7 +110,7 @@ theme: next
 ## Docs: https://hexo.io/docs/one-command-deployment
 deploy:
 - type: git
-  repo: git@github.com:lsy-0xcc/lsy-0xcc.github.io.git
+  repo: git@github.com:lsy0xcc/lsy0xcc.github.io.git
   branch: github-pages
 
 # 内置搜索
